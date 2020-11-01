@@ -2,7 +2,7 @@ package me.cpele.androcommut
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import me.cpele.androcommut.ui.main.OriginDestinationFragment
+import me.cpele.androcommut.ui.od.OriginDestinationFragment
 
 class MainActivity : AppCompatActivity() {
 

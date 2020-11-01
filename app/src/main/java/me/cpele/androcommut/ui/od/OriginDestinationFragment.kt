@@ -1,4 +1,4 @@
-package me.cpele.androcommut.ui.main
+package me.cpele.androcommut.ui.od
 
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
