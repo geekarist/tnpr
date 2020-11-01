@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/originDestinationFragment">
+
+    <fragment
+        android:id="@+id/originDestinationFragment"
+        android:name="me.cpele.androcommut.ui.od.OriginDestinationFragment"
+        android:label="origin_destination_fragment"
+        tools:layout="@layout/origin_destination_fragment" >
+        <action
+            android:id="@+id/action_originDestinationFragment_to_autosuggestFragment"
+            app:destination="@id/autosuggestFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/autosuggestFragment"
+        android:name="me.cpele.androcommut.ui.autosuggest.AutosuggestFragment"
+        android:label="autosuggest_fragment"
+        tools:layout="@layout/autosuggest_fragment" >
+        <action
+            android:id="@+id/action_autosuggestFragment_pop"
+            app:popUpTo="@id/autosuggestFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+</navigation>
