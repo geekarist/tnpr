@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">AndroCommut</string>
+    <string name="od_origin">Origin</string>
+    <string name="od_destination">Destination</string>
+    <string name="od_instructions">Please choose an origin and a destination</string>
 </resources>
