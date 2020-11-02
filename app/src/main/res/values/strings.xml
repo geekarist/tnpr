@@ -5,4 +5,5 @@
     <string name="od_instructions">Please choose an origin and a destination</string>
     <string name="od_search">Search</string>
     <string name="autosuggest_place">Place</string>
+    <string name="autosuggest_search_query">Search query</string>
 </resources>
