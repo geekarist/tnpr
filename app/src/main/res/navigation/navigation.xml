@@ -9,19 +9,27 @@
         android:id="@+id/originDestinationFragment"
         android:name="me.cpele.androcommut.ui.od.OriginDestinationFragment"
         android:label="origin_destination_fragment"
-        tools:layout="@layout/origin_destination_fragment" >
+        tools:layout="@layout/origin_destination_fragment">
         <action
             android:id="@+id/action_originDestinationFragment_to_autosuggestFragment"
             app:destination="@id/autosuggestFragment" />
+        <action
+            android:id="@+id/action_originDestinationFragment_to_journeysFragment2"
+            app:destination="@id/journeysFragment" />
     </fragment>
     <fragment
         android:id="@+id/autosuggestFragment"
         android:name="me.cpele.androcommut.ui.autosuggest.AutosuggestFragment"
         android:label="autosuggest_fragment"
-        tools:layout="@layout/autosuggest_fragment" >
+        tools:layout="@layout/autosuggest_fragment">
         <action
             android:id="@+id/action_autosuggestFragment_pop"
             app:popUpTo="@id/autosuggestFragment"
             app:popUpToInclusive="true" />
     </fragment>
+    <fragment
+        android:id="@+id/journeysFragment"
+        android:name="me.cpele.androcommut.ui.journeys.JourneysFragment"
+        android:label="journeys_fragment"
+        tools:layout="@layout/journeys_fragment" />
 </navigation>

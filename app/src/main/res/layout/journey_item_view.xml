@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginTop="8dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="16dp">
+
+        <TextView
+            android:id="@+id/journey_item_segments"
+            android:layout_width="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/journey_item_start"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="👟 · 🚂 R · 🚆 1 · 🚋 3b · 👟" />
+
+        <TextView
+            android:id="@+id/journey_item_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/journey_item_end"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/journey_item_segments"
+            tools:text="From: Montigny-sur-Loing at 15:45" />
+
+        <TextView
+            android:id="@+id/journey_item_duration"
+            style="@style/TextAppearance.AppCompat.Medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="122 min" />
+
+        <TextView
+            android:id="@+id/journey_item_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/journey_item_start"
+            tools:text="To: Gare de Lyon at 16:45" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>
