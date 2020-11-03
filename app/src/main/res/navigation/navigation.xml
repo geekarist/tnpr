@@ -31,5 +31,14 @@
         android:id="@+id/journeysFragment"
         android:name="me.cpele.androcommut.journeys.JourneysFragment"
         android:label="journeys_fragment"
-        tools:layout="@layout/journeys_fragment" />
+        tools:layout="@layout/journeys_fragment">
+        <action
+            android:id="@+id/action_journeysFragment_to_roadmapFragment"
+            app:destination="@id/roadmapFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/roadmapFragment"
+        android:name="me.cpele.androcommut.roadmap.RoadmapFragment"
+        android:label="roadmap_fragment"
+        tools:layout="@layout/roadmap_fragment" />
 </navigation>
