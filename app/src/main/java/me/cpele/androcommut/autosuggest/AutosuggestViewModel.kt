@@ -1,4 +1,4 @@
-package me.cpele.androcommut.ui.autosuggest
+package me.cpele.androcommut.autosuggest
 
 import androidx.lifecycle.ViewModel
 

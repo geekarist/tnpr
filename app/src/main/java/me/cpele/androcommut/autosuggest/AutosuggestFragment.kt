@@ -1,11 +1,11 @@
-package me.cpele.androcommut.ui.autosuggest
+package me.cpele.androcommut.autosuggest
 
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import me.cpele.androcommut.R
 
 class AutosuggestFragment : Fragment() {

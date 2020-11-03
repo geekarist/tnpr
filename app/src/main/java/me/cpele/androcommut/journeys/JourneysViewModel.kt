@@ -1,4 +1,4 @@
-package me.cpele.androcommut.ui.journeys
+package me.cpele.androcommut.journeys
 
 import androidx.lifecycle.ViewModel
 

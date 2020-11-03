@@ -1,11 +1,11 @@
-package me.cpele.androcommut.ui.od
+package me.cpele.androcommut.origdest
 
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import me.cpele.androcommut.R
 
 class OriginDestinationFragment : Fragment() {

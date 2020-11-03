@@ -1,4 +1,4 @@
-package me.cpele.androcommut.ui.od
+package me.cpele.androcommut.origdest
 
 import androidx.lifecycle.ViewModel
 

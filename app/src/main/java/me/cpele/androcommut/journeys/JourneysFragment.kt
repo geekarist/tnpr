@@ -1,4 +1,4 @@
-package me.cpele.androcommut.ui.journeys
+package me.cpele.androcommut.journeys
 
 import android.os.Bundle
 import android.view.LayoutInflater
