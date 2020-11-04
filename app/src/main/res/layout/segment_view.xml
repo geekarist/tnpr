@@ -23,7 +23,7 @@
             app:layout_constraintEnd_toStartOf="@+id/segment_duration"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="At 15:45, take the R line at Montigny-sur-Loing to Gare de Lyon." />
+            tools:text="At 15:45, take the Transilien R line at Montigny-sur-Loing on its way to Gare de Lyon." />
 
         <TextView
             android:id="@+id/segment_duration"
@@ -31,6 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/segment_description"
             app:layout_constraintTop_toTopOf="parent"
