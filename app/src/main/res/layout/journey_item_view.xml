@@ -22,7 +22,7 @@
             app:layout_constraintBottom_toTopOf="@+id/journey_item_start"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="👟 · 🚂 R · 🚆 1 · 🚋 3b · 👟" />
+            tools:text="Transilien R, Métro 1, Tramway T3b" />
 
         <TextView
             android:id="@+id/journey_item_start"
