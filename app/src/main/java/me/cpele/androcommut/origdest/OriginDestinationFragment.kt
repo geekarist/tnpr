@@ -1,5 +1,6 @@
 package me.cpele.androcommut.origdest
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -30,6 +31,7 @@ class OriginDestinationFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(OriginDestinationViewModel::class.java)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -44,12 +46,14 @@ class OriginDestinationFragment : Fragment() {
             findNavController().navigate(navTarget)
         }
 
-        view.findViewById<View>(R.id.od_origin_edit_text).setOnClickListener {
+        view.findViewById<View>(R.id.od_origin_edit_text).setOnTouchListener { _, _ ->
             viewModel.dispatch(OriginDestinationViewModel.Intention.OriginClicked)
+            false
         }
 
-        view.findViewById<View>(R.id.od_destination_edit_text).setOnClickListener {
+        view.findViewById<View>(R.id.od_destination_edit_text).setOnTouchListener { _, _ ->
             viewModel.dispatch(OriginDestinationViewModel.Intention.DestinationClicked)
+            false
         }
     }
 }
