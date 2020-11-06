@@ -4,8 +4,10 @@ class Event<T>(private val value: T) {
 
     private var isConsumed = false
 
-    fun consume(): T = synchronized(this) {
-        isConsumed = true
-        value
+    fun consume(block: (T) -> Unit) = synchronized(this) {
+        if (!isConsumed) {
+            isConsumed = true
+            block(value)
+        }
     }
 }

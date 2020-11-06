@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
@@ -36,24 +37,29 @@ class OriginDestinationFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.effectLive.observe(viewLifecycleOwner) { event ->
-            val effect = event.consume()
-            val navTarget = when (effect) {
-                is OriginDestinationViewModel.Effect.NavigateToAutosuggest.Origin ->
-                    R.id.action_originDestinationFragment_to_autosuggestFragment
-                is OriginDestinationViewModel.Effect.NavigateToAutosuggest.Destination ->
-                    R.id.action_originDestinationFragment_to_autosuggestFragment
+            event.consume { effect ->
+                val navTarget = when (effect) {
+                    is OriginDestinationViewModel.Effect.NavigateToAutosuggest.Origin ->
+                        R.id.action_originDestinationFragment_to_autosuggestFragment
+                    is OriginDestinationViewModel.Effect.NavigateToAutosuggest.Destination ->
+                        R.id.action_originDestinationFragment_to_autosuggestFragment
+                }
+                findNavController().navigate(navTarget)
             }
-            findNavController().navigate(navTarget)
         }
 
-        view.findViewById<View>(R.id.od_origin_edit_text).setOnTouchListener { _, _ ->
-            viewModel.dispatch(OriginDestinationViewModel.Intention.OriginClicked)
-            false
+        view.findViewById<View>(R.id.od_origin_edit_text).setOnTouchListener { _, ev ->
+            if (ev.action == MotionEvent.ACTION_UP) {
+                viewModel.dispatch(OriginDestinationViewModel.Intention.OriginClicked)
+            }
+            true
         }
 
-        view.findViewById<View>(R.id.od_destination_edit_text).setOnTouchListener { _, _ ->
-            viewModel.dispatch(OriginDestinationViewModel.Intention.DestinationClicked)
-            false
+        view.findViewById<View>(R.id.od_destination_edit_text).setOnTouchListener { _, ev ->
+            if (ev.action == MotionEvent.ACTION_UP) {
+                viewModel.dispatch(OriginDestinationViewModel.Intention.DestinationClicked)
+            }
+            true
         }
     }
 }

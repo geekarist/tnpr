@@ -21,12 +21,7 @@
         android:id="@+id/autosuggestFragment"
         android:name="me.cpele.androcommut.autosuggest.AutosuggestFragment"
         android:label="autosuggest_fragment"
-        tools:layout="@layout/autosuggest_fragment">
-        <action
-            android:id="@+id/action_autosuggestFragment_pop"
-            app:popUpTo="@id/autosuggestFragment"
-            app:popUpToInclusive="true" />
-    </fragment>
+        tools:layout="@layout/autosuggest_fragment" />
     <fragment
         android:id="@+id/journeysFragment"
         android:name="me.cpele.androcommut.journeys.JourneysFragment"
