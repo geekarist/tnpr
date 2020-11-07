@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
@@ -48,18 +47,12 @@ class OriginDestinationFragment : Fragment() {
             }
         }
 
-        view.findViewById<View>(R.id.od_origin_edit_text).setOnTouchListener { _, ev ->
-            if (ev.action == MotionEvent.ACTION_UP) {
-                viewModel.dispatch(OriginDestinationViewModel.Intention.OriginClicked)
-            }
-            true
+        view.findViewById<View>(R.id.od_origin_button).setOnClickListener {
+            viewModel.dispatch(OriginDestinationViewModel.Intention.OriginClicked)
         }
 
-        view.findViewById<View>(R.id.od_destination_edit_text).setOnTouchListener { _, ev ->
-            if (ev.action == MotionEvent.ACTION_UP) {
-                viewModel.dispatch(OriginDestinationViewModel.Intention.DestinationClicked)
-            }
-            true
+        view.findViewById<View>(R.id.od_destination_button).setOnClickListener {
+            viewModel.dispatch(OriginDestinationViewModel.Intention.DestinationClicked)
         }
     }
 }
