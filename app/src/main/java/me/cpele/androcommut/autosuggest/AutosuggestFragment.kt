@@ -1,6 +1,7 @@
 package me.cpele.androcommut.autosuggest
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,6 +44,10 @@ class AutosuggestFragment : Fragment() {
 
         view.findViewById<EditText>(R.id.autosuggest_search_edit).addTextChangedListener {
             viewModel.dispatch(AutosuggestViewModel.Intention.QueryEdited(it))
+        }
+
+        viewModel.stateLive.observe(viewLifecycleOwner) { state ->
+            Log.d(javaClass.simpleName, "State: $state")
         }
     }
 }
