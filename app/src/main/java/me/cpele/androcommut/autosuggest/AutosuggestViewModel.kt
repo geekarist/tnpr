@@ -1,34 +1,57 @@
 package me.cpele.androcommut.autosuggest
 
-import android.util.Log
+import android.app.Application
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import me.cpele.androcommut.Event
 import me.cpele.androcommut.Model
+import me.cpele.androcommut.NavitiaService
+import me.cpele.androcommut.R
 import me.cpele.androcommut.autosuggest.AutosuggestViewModel.*
 
 @FlowPreview
-class AutosuggestViewModel : ViewModel(), Model<Intention, State, Effect> {
+class AutosuggestViewModel(
+    private val navitiaService: NavitiaService,
+    private val application: Application
+) : ViewModel(), Model<Intention, State, Effect> {
 
+    private val _stateLive = MutableLiveData<State>().apply { value = State(emptyList()) }
     override val stateLive: LiveData<State>
-        get() = TODO("Not yet implemented")
+        get() = _stateLive
+
     override val effectLive: LiveData<Event<Effect>>
         get() = TODO("Not yet implemented")
 
     private val queryFlow = MutableStateFlow<String?>(null)
 
-    private val debouncedQueryFlow = queryFlow.debounce(500)
-
     init {
-        debouncedQueryFlow.onEach { query ->
-            Log.d(javaClass.simpleName, "To do: search for [$query]")
-        }.launchIn(viewModelScope)
+        queryFlow.debounce(500)
+            .flowOn(Dispatchers.Default)
+            .map { query -> navitiaService.places(q = query) }
+            .flowOn(Dispatchers.IO)
+            .map { navitiaPlaces ->
+                navitiaPlaces.places.map { navitiaPlace ->
+                    PlaceUiModel(
+                        label = navitiaPlace.label
+                            ?: navitiaPlace.name
+                            ?: navitiaPlace.id
+                            ?: application.getString(R.string.autosuggest_unknown_place)
+                    )
+                }
+            }
+            .flowOn(Dispatchers.Default)
+            .onEach { placeUiModels ->
+                val currentState = stateLive.value
+                val newState = currentState?.copy(places = placeUiModels)
+                _stateLive.value = newState
+            }
+            .flowOn(Dispatchers.Main)
+            .launchIn(viewModelScope)
     }
 
     override fun dispatch(intention: Intention) {
@@ -41,7 +64,7 @@ class AutosuggestViewModel : ViewModel(), Model<Intention, State, Effect> {
         data class QueryEdited(val text: CharSequence?) : Intention()
     }
 
-    sealed class State
+    data class State(val places: List<PlaceUiModel>)
 
     sealed class Effect
 }
