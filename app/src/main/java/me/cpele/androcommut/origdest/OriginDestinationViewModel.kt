@@ -7,8 +7,8 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.cpele.androcommut.Event
-import me.cpele.androcommut.Model
+import me.cpele.afk.Event
+import me.cpele.afk.Model
 import me.cpele.androcommut.origdest.OriginDestinationViewModel.*
 
 class OriginDestinationViewModel : ViewModel(), Model<Intention, State, Effect> {

@@ -1,4 +1,4 @@
-package me.cpele.androcommut
+package me.cpele.afk
 
 import androidx.lifecycle.LiveData
 

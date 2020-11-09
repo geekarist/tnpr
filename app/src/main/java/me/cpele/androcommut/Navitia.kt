@@ -4,6 +4,6 @@ interface NavitiaService {
     fun places(q: String?): NavitiaPlacesResult
 }
 
-data class NavitiaPlacesResult(val places: List<NavitiaPlaces>)
+data class NavitiaPlacesResult(val places: List<NavitiaPlace>)
 
-data class NavitiaPlaces(val id: String?, val name: String?, val label: String?)
+data class NavitiaPlace(val id: String?, val name: String?, val label: String?)

@@ -1,4 +1,4 @@
-package me.cpele.androcommut
+package me.cpele.afk
 
 class Event<T>(private val value: T) {
 

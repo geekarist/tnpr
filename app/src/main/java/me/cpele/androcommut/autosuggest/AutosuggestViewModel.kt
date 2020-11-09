@@ -8,8 +8,8 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
-import me.cpele.androcommut.Event
-import me.cpele.androcommut.Model
+import me.cpele.afk.Event
+import me.cpele.afk.Model
 import me.cpele.androcommut.NavitiaService
 import me.cpele.androcommut.R
 import me.cpele.androcommut.autosuggest.AutosuggestViewModel.*
