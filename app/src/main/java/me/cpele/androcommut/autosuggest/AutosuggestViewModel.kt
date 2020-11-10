@@ -34,7 +34,10 @@ class AutosuggestViewModel(
     init {
         queryFlow.debounce(500)
             .flowOn(Dispatchers.Default)
-            .map { query -> navitiaService.places(auth = BuildConfig.NAVITIA_API_KEY, q = query) }
+            .map { query ->
+                Log.d(javaClass.simpleName, "Yo")
+                navitiaService.places(auth = BuildConfig.NAVITIA_API_KEY, q = query)
+            }
             .flowOn(Dispatchers.IO)
             .map { navitiaPlaces ->
                 navitiaPlaces.places.map { navitiaPlace ->
@@ -47,18 +50,16 @@ class AutosuggestViewModel(
                 }
             }
             .flowOn(Dispatchers.Default)
+            .catch { cause ->
+                Log.i(javaClass.simpleName, "Error querying places", cause)
+                emit(emptyList())
+            }
             .onEach { placeUiModels ->
                 val currentState = stateLive.value
                 val newState = currentState?.copy(places = placeUiModels)
                 _stateLive.value = newState
             }
             .flowOn(Dispatchers.Main)
-            .catch { cause ->
-                Log.i(javaClass.simpleName, "Error querying places", cause)
-                val currentState = stateLive.value
-                val newState = currentState?.copy(places = emptyList())
-                _stateLive.value = newState
-            }
             .launchIn(viewModelScope)
     }
 
