@@ -1,7 +1,6 @@
 package me.cpele.androcommut.autosuggest
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +8,7 @@ import android.widget.EditText
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.FlowPreview
 import me.cpele.afk.CustomApp
 import me.cpele.afk.ViewModelFactory
@@ -46,8 +46,12 @@ class AutosuggestFragment : Fragment() {
             viewModel.dispatch(AutosuggestViewModel.Intention.QueryEdited(it))
         }
 
+        val adapter = AutosuggestAdapter()
+        val recycler = view.findViewById<RecyclerView>(R.id.autosuggest_results_recycler)
+        recycler.adapter = adapter
+
         viewModel.stateLive.observe(viewLifecycleOwner) { state ->
-            Log.d(javaClass.simpleName, "State: $state")
+            adapter.submitList(state?.places)
         }
     }
 }
