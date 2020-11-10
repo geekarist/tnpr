@@ -3,7 +3,7 @@
     package="me.cpele.androcommut">
 
     <application
-        android:name="me.cpele.afk.CustomApp"
+        android:name=".CustomApp"
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@mipmap/ic_launcher"

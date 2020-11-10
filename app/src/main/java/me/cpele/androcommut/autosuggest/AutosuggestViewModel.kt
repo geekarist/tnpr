@@ -1,6 +1,7 @@
 package me.cpele.androcommut.autosuggest
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,6 +11,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import me.cpele.afk.Event
 import me.cpele.afk.Model
+import me.cpele.androcommut.BuildConfig
 import me.cpele.androcommut.NavitiaService
 import me.cpele.androcommut.R
 import me.cpele.androcommut.autosuggest.AutosuggestViewModel.*
@@ -32,7 +34,7 @@ class AutosuggestViewModel(
     init {
         queryFlow.debounce(500)
             .flowOn(Dispatchers.Default)
-            .map { query -> navitiaService.places(q = query) }
+            .map { query -> navitiaService.places(auth = BuildConfig.NAVITIA_API_KEY, q = query) }
             .flowOn(Dispatchers.IO)
             .map { navitiaPlaces ->
                 navitiaPlaces.places.map { navitiaPlace ->
@@ -51,6 +53,12 @@ class AutosuggestViewModel(
                 _stateLive.value = newState
             }
             .flowOn(Dispatchers.Main)
+            .catch { cause ->
+                Log.i(javaClass.simpleName, "Error querying places", cause)
+                val currentState = stateLive.value
+                val newState = currentState?.copy(places = emptyList())
+                _stateLive.value = newState
+            }
             .launchIn(viewModelScope)
     }
 
