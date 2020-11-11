@@ -1,7 +1,6 @@
 package me.cpele.androcommut.autosuggest
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,7 +10,9 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import me.cpele.afk.Event
 import me.cpele.afk.Model
+import me.cpele.afk.Outcome
 import me.cpele.androcommut.BuildConfig
+import me.cpele.androcommut.NavitiaPlacesResult
 import me.cpele.androcommut.NavitiaService
 import me.cpele.androcommut.R
 import me.cpele.androcommut.autosuggest.AutosuggestViewModel.*
@@ -34,26 +35,10 @@ class AutosuggestViewModel(
     init {
         queryFlow.debounce(500)
             .flowOn(Dispatchers.Default)
-            .map { query ->
-                Log.d(javaClass.simpleName, "Yo")
-                navitiaService.places(auth = BuildConfig.NAVITIA_API_KEY, q = query)
-            }
+            .map { query -> fetchPlaces(query) }
             .flowOn(Dispatchers.IO)
-            .map { navitiaPlaces ->
-                navitiaPlaces.places.map { navitiaPlace ->
-                    PlaceUiModel(
-                        label = navitiaPlace.label
-                            ?: navitiaPlace.name
-                            ?: navitiaPlace.id
-                            ?: application.getString(R.string.autosuggest_unknown_place)
-                    )
-                }
-            }
+            .map { result -> mapResultToUiModels(result) }
             .flowOn(Dispatchers.Default)
-            .catch { cause ->
-                Log.i(javaClass.simpleName, "Error querying places", cause)
-                emit(emptyList())
-            }
             .onEach { placeUiModels ->
                 val currentState = stateLive.value
                 val newState = currentState?.copy(places = placeUiModels)
@@ -62,6 +47,27 @@ class AutosuggestViewModel(
             .flowOn(Dispatchers.Main)
             .launchIn(viewModelScope)
     }
+
+    private suspend fun fetchPlaces(query: String?): Outcome<NavitiaPlacesResult> =
+        try {
+            val response = navitiaService.places(auth = BuildConfig.NAVITIA_API_KEY, q = query)
+            Outcome.Success(response)
+        } catch (t: Throwable) {
+            Outcome.Failure(t)
+        }
+
+    private fun mapResultToUiModels(result: Outcome<NavitiaPlacesResult>): List<PlaceUiModel> =
+        when (result) {
+            is Outcome.Success -> result.value.places.map { navitiaPlace ->
+                PlaceUiModel(
+                    label = navitiaPlace.label
+                        ?: navitiaPlace.name
+                        ?: navitiaPlace.id
+                        ?: application.getString(R.string.autosuggest_unknown_place)
+                )
+            }
+            is Outcome.Failure -> emptyList()
+        }
 
     override fun dispatch(intention: Intention) {
         when (intention) {
