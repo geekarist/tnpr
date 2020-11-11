@@ -33,7 +33,7 @@ class AutosuggestViewModel(
     private val queryFlow = MutableStateFlow<String?>(null)
 
     init {
-        queryFlow.debounce(500)
+        queryFlow.debounce(1000)
             .flowOn(Dispatchers.Default)
             .map { query -> fetchPlaces(query) }
             .flowOn(Dispatchers.IO)
