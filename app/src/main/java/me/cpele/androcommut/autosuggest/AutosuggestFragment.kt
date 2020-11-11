@@ -8,7 +8,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.FlowPreview
 import me.cpele.afk.ViewModelFactory
@@ -22,7 +22,14 @@ class AutosuggestFragment : Fragment() {
         fun newInstance() = AutosuggestFragment()
     }
 
-    private lateinit var viewModel: AutosuggestViewModel
+    private val viewModel: AutosuggestViewModel by viewModels {
+        ViewModelFactory {
+            AutosuggestViewModel(
+                CustomApp.instance.navitiaService,
+                CustomApp.instance
+            )
+        }
+    }
 
 
     override fun onCreateView(
@@ -34,18 +41,6 @@ class AutosuggestFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelFactory {
-                AutosuggestViewModel(
-                    CustomApp.instance.navitiaService,
-                    CustomApp.instance
-                )
-            }
-        ).get(
-            AutosuggestViewModel::class.java
-        )
 
         view.findViewById<EditText>(R.id.autosuggest_search_edit).addTextChangedListener {
             viewModel.dispatch(AutosuggestViewModel.Intention.QueryEdited(it))
