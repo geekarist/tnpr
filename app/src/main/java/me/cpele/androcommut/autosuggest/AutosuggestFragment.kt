@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -50,7 +51,9 @@ class AutosuggestFragment : Fragment() {
             viewModel.dispatch(AutosuggestViewModel.Intention.QueryEdited(it))
         }
 
-        val adapter = AutosuggestAdapter()
+        val adapter = AutosuggestAdapter {
+            Toast.makeText(context, "Yo: $it", Toast.LENGTH_SHORT).show()
+        }
         val recycler = view.findViewById<RecyclerView>(R.id.autosuggest_results_recycler)
         recycler.adapter = adapter
 

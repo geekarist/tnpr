@@ -6,7 +6,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import me.cpele.androcommut.R
 
-class AutosuggestAdapter : ListAdapter<PlaceUiModel, AutosuggestViewHolder>(DiffCallback) {
+class AutosuggestAdapter(private val onItemClickListener: (PlaceUiModel) -> Unit) :
+    ListAdapter<PlaceUiModel, AutosuggestViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AutosuggestViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -17,6 +18,9 @@ class AutosuggestAdapter : ListAdapter<PlaceUiModel, AutosuggestViewHolder>(Diff
     override fun onBindViewHolder(holder: AutosuggestViewHolder, position: Int) {
         val item = getItem(position)
         holder.bind(item)
+        holder.itemView.setOnClickListener {
+            onItemClickListener(item)
+        }
     }
 
     object DiffCallback : DiffUtil.ItemCallback<PlaceUiModel>() {
