@@ -5,10 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.FlowPreview
 import me.cpele.afk.ViewModelFactory
@@ -47,7 +48,13 @@ class AutosuggestFragment : Fragment() {
         }
 
         val adapter = AutosuggestAdapter {
-            Toast.makeText(context, "Yo: $it", Toast.LENGTH_SHORT).show()
+            findNavController().navigate(
+                R.id.action_autosuggestFragment_to_originDestinationFragment,
+                bundleOf(
+                    "origin" to it.label,
+                    "destination" to it.label
+                )
+            )
         }
         val recycler = view.findViewById<RecyclerView>(R.id.autosuggest_results_recycler)
         recycler.adapter = adapter

@@ -13,7 +13,7 @@ import me.cpele.androcommut.origdest.OriginDestinationViewModel.*
 
 class OriginDestinationViewModel : ViewModel(), Model<Intention, State, Effect> {
 
-    private val _stateLive = MutableLiveData<State>()
+    private val _stateLive = MutableLiveData(State(null, null))
     override val stateLive: LiveData<State> get() = _stateLive
 
     private val _effectLive = MutableLiveData<Event<Effect>>()
@@ -21,16 +21,25 @@ class OriginDestinationViewModel : ViewModel(), Model<Intention, State, Effect> 
 
     override fun dispatch(intention: Intention) {
         viewModelScope.launch {
-            val effect = when (intention) {
-                is Intention.OriginClicked -> Effect.NavigateToAutosuggest.Origin
-                is Intention.DestinationClicked -> Effect.NavigateToAutosuggest.Destination
+            val (effect, newState) = when (intention) {
+                is Intention.Load -> null to stateLive.value?.copy(
+                    origin = intention.origin,
+                    destination = intention.destination
+                )
+                is Intention.OriginClicked -> Effect.NavigateToAutosuggest.Origin to stateLive.value
+                is Intention.DestinationClicked -> Effect.NavigateToAutosuggest.Destination to stateLive.value
             }
-            val event: Event<Effect> = Event(effect)
-            withContext(Dispatchers.Main) { _effectLive.value = event }
+            withContext(Dispatchers.Main) {
+                if (effect != null) _effectLive.value = Event(effect)
+                _stateLive.value = newState
+            }
         }
     }
 
     sealed class Intention {
+
+        data class Load(val origin: String?, val destination: String?) : Intention()
+
         object OriginClicked : Intention()
         object DestinationClicked : Intention()
     }
