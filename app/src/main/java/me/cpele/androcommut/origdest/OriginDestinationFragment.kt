@@ -40,12 +40,16 @@ class OriginDestinationFragment : Fragment() {
         originButton = view.findViewById(R.id.od_origin_button)
         destinationButton = view.findViewById(R.id.od_destination_button)
 
-        viewModel.dispatch(
-            OriginDestinationViewModel.Intention.Load(
-                arguments?.getString("origin"),
-                arguments?.getString("destination")
-            )
-        )
+        val intention = OriginDestinationFragmentArgs
+            .fromBundle(requireArguments())
+            .let { args ->
+                OriginDestinationViewModel.Intention.Load(
+                    args.origin,
+                    args.destination
+                )
+            }
+
+        viewModel.dispatch(intention)
 
         viewModel.stateLive.observe(viewLifecycleOwner) { state ->
             originButton.text = state?.origin

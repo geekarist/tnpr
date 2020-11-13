@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import androidx.core.os.bundleOf
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -49,10 +48,9 @@ class AutosuggestFragment : Fragment() {
 
         val adapter = AutosuggestAdapter {
             findNavController().navigate(
-                R.id.action_autosuggestFragment_to_originDestinationFragment,
-                bundleOf(
-                    "origin" to it.label,
-                    "destination" to it.label
+                AutosuggestFragmentDirections.actionAutosuggestFragmentToOriginDestinationFragment(
+                    it.label,
+                    it.label
                 )
             )
         }

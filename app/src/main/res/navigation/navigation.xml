@@ -16,6 +16,16 @@
         <action
             android:id="@+id/action_originDestinationFragment_to_journeysFragment2"
             app:destination="@id/journeysFragment" />
+        <argument
+            android:name="origin"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="destination"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
     <fragment
         android:id="@+id/autosuggestFragment"
