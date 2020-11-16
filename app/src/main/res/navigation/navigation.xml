@@ -11,7 +11,7 @@
         android:label="origin_destination_fragment"
         tools:layout="@layout/origin_destination_fragment">
         <action
-            android:id="@+id/action_originDestinationFragment_to_autosuggestFragment"
+            android:id="@+id/action_originDestination_to_autosuggest"
             app:destination="@id/autosuggestFragment" />
         <action
             android:id="@+id/action_originDestinationFragment_to_journeysFragment2"
@@ -35,6 +35,9 @@
         <action
             android:id="@+id/action_autosuggestFragment_to_originDestinationFragment"
             app:destination="@id/originDestinationFragment" />
+        <argument
+            android:name="trigger"
+            app:argType="me.cpele.androcommut.autosuggest.AutosuggestFragment$Trigger" />
     </fragment>
     <fragment
         android:id="@+id/journeysFragment"

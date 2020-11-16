@@ -31,7 +31,6 @@ class AutosuggestFragment : Fragment() {
         }
     }
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -46,11 +45,13 @@ class AutosuggestFragment : Fragment() {
             viewModel.dispatch(AutosuggestViewModel.Intention.QueryEdited(it))
         }
 
-        val adapter = AutosuggestAdapter {
+        val args = arguments?.let { AutosuggestFragmentArgs.fromBundle(it) }
+
+        val adapter = AutosuggestAdapter { uiModel ->
             findNavController().navigate(
                 AutosuggestFragmentDirections.actionAutosuggestFragmentToOriginDestinationFragment(
-                    it.label,
-                    it.label
+                    uiModel.label.takeIf { args?.trigger == Trigger.ORIGIN },
+                    uiModel.label.takeIf { args?.trigger == Trigger.DESTINATION }
                 )
             )
         }
@@ -60,5 +61,9 @@ class AutosuggestFragment : Fragment() {
         viewModel.stateLive.observe(viewLifecycleOwner) { state ->
             adapter.submitList(state?.places)
         }
+    }
+
+    enum class Trigger {
+        ORIGIN, DESTINATION
     }
 }
