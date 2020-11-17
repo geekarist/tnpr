@@ -1,5 +1,6 @@
 package me.cpele.androcommut.autosuggest
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,7 +9,6 @@ import android.widget.EditText
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.FlowPreview
 import me.cpele.afk.ViewModelFactory
@@ -22,6 +22,8 @@ class AutosuggestFragment : Fragment() {
         fun newInstance() = AutosuggestFragment()
     }
 
+    private var listener: Listener? = null
+
     private val viewModel: AutosuggestViewModel by viewModels {
         ViewModelFactory {
             AutosuggestViewModel(
@@ -29,6 +31,12 @@ class AutosuggestFragment : Fragment() {
                 CustomApp.instance
             )
         }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        listener = context as? Listener
+            ?: throw IllegalStateException("${context::class.qualifiedName} has to implement ${Listener::class.qualifiedName}")
     }
 
     override fun onCreateView(
@@ -48,11 +56,10 @@ class AutosuggestFragment : Fragment() {
         val args = arguments?.let { AutosuggestFragmentArgs.fromBundle(it) }
 
         val adapter = AutosuggestAdapter { uiModel ->
-            findNavController().navigate(
-                AutosuggestFragmentDirections.actionAutosuggestFragmentToOriginDestinationFragment(
-                    uiModel.label.takeIf { args?.trigger == Trigger.ORIGIN },
-                    uiModel.label.takeIf { args?.trigger == Trigger.DESTINATION }
-                )
+            listener?.takeAutosuggestion(
+                this,
+                args?.trigger,
+                uiModel.label
             )
         }
         val recycler = view.findViewById<RecyclerView>(R.id.autosuggest_results_recycler)
@@ -61,6 +68,15 @@ class AutosuggestFragment : Fragment() {
         viewModel.stateLive.observe(viewLifecycleOwner) { state ->
             adapter.submitList(state?.places)
         }
+    }
+
+    override fun onDetach() {
+        listener = null
+        super.onDetach()
+    }
+
+    interface Listener {
+        fun takeAutosuggestion(fragment: Fragment, trigger: Trigger?, label: String)
     }
 
     enum class Trigger {

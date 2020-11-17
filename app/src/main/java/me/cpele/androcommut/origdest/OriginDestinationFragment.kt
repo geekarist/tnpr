@@ -37,7 +37,7 @@ class OriginDestinationFragment : Fragment() {
 
         listener = context as? Listener
             ?: throw IllegalStateException(
-                "${context.javaClass.simpleName} has to implement ${Listener::class.simpleName}"
+                "${context::class.qualifiedName} has to implement ${Listener::class.qualifiedName}"
             )
     }
 
