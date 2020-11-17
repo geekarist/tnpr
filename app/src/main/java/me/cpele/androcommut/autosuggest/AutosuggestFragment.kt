@@ -76,10 +76,6 @@ class AutosuggestFragment : Fragment() {
     }
 
     interface Listener {
-        fun takeAutosuggestion(fragment: Fragment, trigger: Trigger?, label: String)
-    }
-
-    enum class Trigger {
-        ORIGIN, DESTINATION
+        fun takeAutosuggestion(fragment: Fragment, trigger: AutosuggestTrigger?, label: String)
     }
 }
