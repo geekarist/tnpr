@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity(),
 
     override fun takeAutosuggestion(
         fragment: Fragment,
-        trigger: AutosuggestTrigger?,
+        trigger: AutosuggestTrigger,
         label: String
     ) = viewModel.dispatch(MainViewModel.Intention.Suggestion(fragment.id, trigger, label))
 }

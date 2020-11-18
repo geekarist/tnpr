@@ -1,6 +1,7 @@
 package me.cpele.androcommut
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import me.cpele.afk.Event
 import me.cpele.afk.Model
@@ -11,7 +12,7 @@ class MainViewModel : ViewModel(), Model<MainViewModel.Intention, Nothing, MainV
     sealed class Intention {
         data class Suggestion(
             val fragmentId: Int,
-            val trigger: AutosuggestTrigger?,
+            val trigger: AutosuggestTrigger,
             val label: String
         ) : Intention()
     }
@@ -26,17 +27,23 @@ class MainViewModel : ViewModel(), Model<MainViewModel.Intention, Nothing, MainV
     }
 
     override fun dispatch(intention: Intention) {
-        TODO("Not yet implemented")
-        // fragment.findNavController().navigate(
-        //     AutosuggestFragmentDirections.actionAutosuggestFragmentToOriginDestinationFragment(
-        //         label.takeIf { trigger == AutosuggestFragment.Trigger.ORIGIN },
-        //         label.takeIf { trigger == AutosuggestFragment.Trigger.DESTINATION }
-        //     )
-        // )
+
+        val (originLabel, destinationLabel) = when (intention) {
+            is Intention.Suggestion ->
+                when (intention.trigger) {
+                    AutosuggestTrigger.ORIGIN -> intention.label to null
+                    AutosuggestTrigger.DESTINATION -> null to intention.label
+                }
+        }
+
+        val effect = Effect.SuggestionIdentified(intention.fragmentId, originLabel, destinationLabel)
+        _effectLive.value = Event(effect)
     }
 
     override val stateLive: LiveData<Nothing>
         get() = TODO("Not yet implemented")
+
+    private val _effectLive = MutableLiveData<Event<Effect>>()
     override val effectLive: LiveData<Event<Effect>>
-        get() = TODO("Not yet implemented")
+        get() = _effectLive
 }

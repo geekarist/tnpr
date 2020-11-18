@@ -54,11 +54,12 @@ class AutosuggestFragment : Fragment() {
         }
 
         val args = arguments?.let { AutosuggestFragmentArgs.fromBundle(it) }
+            ?: throw IllegalStateException("Fragment args incorrect: $arguments")
 
         val adapter = AutosuggestAdapter { uiModel ->
             listener?.takeAutosuggestion(
                 this,
-                args?.trigger,
+                args.trigger,
                 uiModel.label
             )
         }
@@ -76,6 +77,6 @@ class AutosuggestFragment : Fragment() {
     }
 
     interface Listener {
-        fun takeAutosuggestion(fragment: Fragment, trigger: AutosuggestTrigger?, label: String)
+        fun takeAutosuggestion(fragment: Fragment, trigger: AutosuggestTrigger, label: String)
     }
 }
