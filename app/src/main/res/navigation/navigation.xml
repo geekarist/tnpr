@@ -34,7 +34,9 @@
         tools:layout="@layout/autosuggest_fragment">
         <action
             android:id="@+id/action_autosuggestFragment_to_originDestinationFragment"
-            app:destination="@id/originDestinationFragment" />
+            app:destination="@id/originDestinationFragment"
+            app:popUpTo="@id/originDestinationFragment"
+            app:popUpToInclusive="true" />
         <argument
             android:name="trigger"
             app:argType="me.cpele.androcommut.autosuggest.AutosuggestTrigger" />
