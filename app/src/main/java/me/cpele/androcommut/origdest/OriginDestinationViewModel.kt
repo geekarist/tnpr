@@ -20,15 +20,20 @@ class OriginDestinationViewModel : ViewModel(), Model<Intention, State, Effect> 
     override val effectLive: LiveData<Event<Effect>> get() = _effectLive
 
     override fun dispatch(intention: Intention) {
+
         viewModelScope.launch {
+
+            val state = stateLive.value
+
             val (effect, newState) = when (intention) {
-                is Intention.Load -> null to stateLive.value?.copy(
-                    origin = intention.origin,
-                    destination = intention.destination
+                is Intention.Load -> null to state?.copy(
+                    origin = intention.origin ?: state.origin,
+                    destination = intention.destination ?: state.destination
                 )
-                is Intention.OriginClicked -> Effect.NavigateToAutosuggest.Origin to stateLive.value
-                is Intention.DestinationClicked -> Effect.NavigateToAutosuggest.Destination to stateLive.value
+                is Intention.OriginClicked -> Effect.NavigateToAutosuggest.Origin to state
+                is Intention.DestinationClicked -> Effect.NavigateToAutosuggest.Destination to state
             }
+
             withContext(Dispatchers.Main) {
                 if (effect != null) _effectLive.value = Event(effect)
                 _stateLive.value = newState
