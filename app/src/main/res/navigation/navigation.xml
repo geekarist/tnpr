@@ -37,7 +37,7 @@
             app:destination="@id/originDestinationFragment" />
         <argument
             android:name="trigger"
-            app:argType="me.cpele.androcommut.autosuggest.AutosuggestFragment$Trigger" />
+            app:argType="me.cpele.androcommut.autosuggest.AutosuggestTrigger" />
     </fragment>
     <fragment
         android:id="@+id/journeysFragment"
