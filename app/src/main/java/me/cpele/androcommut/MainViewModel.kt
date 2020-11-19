@@ -18,16 +18,22 @@ class MainViewModel : ViewModel(), Model<MainViewModel.Intention, Nothing, MainV
 
     override fun dispatch(intention: Intention) {
 
-        val (originLabel, destinationLabel) = when (intention) {
+        val effect = when (intention) {
             is Intention.Suggestion ->
                 when (intention.trigger) {
-                    AutosuggestTrigger.ORIGIN -> intention.label to null
-                    AutosuggestTrigger.DESTINATION -> null to intention.label
+                    AutosuggestTrigger.ORIGIN -> Effect.SuggestionIdentified(
+                        intention.fragmentId,
+                        intention.label,
+                        null
+                    )
+                    AutosuggestTrigger.DESTINATION -> Effect.SuggestionIdentified(
+                        intention.fragmentId,
+                        null,
+                        intention.label
+                    )
                 }
         }
 
-        val effect =
-            Effect.SuggestionIdentified(intention.fragmentId, originLabel, destinationLabel)
         _effectLive.value = Event(effect)
     }
 
