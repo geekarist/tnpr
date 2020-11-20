@@ -5,11 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import me.cpele.afk.Event
 import me.cpele.afk.Model
+import me.cpele.androcommut.MainViewModel.*
 import me.cpele.androcommut.autosuggest.AutosuggestTrigger
 
-class MainViewModel : ViewModel(), Model<MainViewModel.Intention, Nothing, MainViewModel.Effect> {
+class MainViewModel : ViewModel(), Model<Intention, State, Effect> {
 
-    override val stateLive: LiveData<Nothing>
+    private val _stateLive = MutableLiveData<State>()
+    override val stateLive: LiveData<State>
         get() = TODO("Not yet implemented")
 
     private val _effectLive = MutableLiveData<Event<Effect>>()
@@ -18,23 +20,31 @@ class MainViewModel : ViewModel(), Model<MainViewModel.Intention, Nothing, MainV
 
     override fun dispatch(intention: Intention) {
 
+        val state = _stateLive.value
+
         val effect = when (intention) {
             is Intention.Suggestion ->
                 when (intention.trigger) {
                     AutosuggestTrigger.ORIGIN -> Effect.SuggestionIdentified(
                         intention.fragmentId,
                         intention.label,
-                        null
+                        state?.destinationLabel
                     )
                     AutosuggestTrigger.DESTINATION -> Effect.SuggestionIdentified(
                         intention.fragmentId,
-                        null,
+                        state?.originLabel,
                         intention.label
                     )
                 }
         }
 
+        val newState = state?.copy(
+            originLabel = effect.originLabel,
+            destinationLabel = effect.destinationLabel
+        )
+
         _effectLive.value = Event(effect)
+        _stateLive.value = newState
     }
 
     sealed class Intention {
@@ -53,4 +63,6 @@ class MainViewModel : ViewModel(), Model<MainViewModel.Intention, Nothing, MainV
         ) : Effect()
 
     }
+
+    data class State(val originLabel: String?, val destinationLabel: String?)
 }
