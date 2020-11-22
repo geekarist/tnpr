@@ -10,7 +10,7 @@ import me.cpele.androcommut.autosuggest.AutosuggestTrigger
 
 class MainViewModel : ViewModel(), Model<Intention, State, Effect> {
 
-    private val _stateLive = MutableLiveData<State>()
+    private val _stateLive = MutableLiveData(State())
     override val stateLive: LiveData<State>
         get() = TODO("Not yet implemented")
 
@@ -64,5 +64,8 @@ class MainViewModel : ViewModel(), Model<Intention, State, Effect> {
 
     }
 
-    data class State(val originLabel: String?, val destinationLabel: String?)
+    data class State(
+        val originLabel: String? = null,
+        val destinationLabel: String? = null
+    )
 }
