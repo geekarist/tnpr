@@ -55,7 +55,7 @@
         android:textAlignment="center"
         android:layout_height="wrap_content"
         android:layout_margin="64dp"
-        android:text="@string/od_instructions"
+        android:text="@string/od_default_instructions"
         app:layout_constraintBottom_toTopOf="@+id/od_origin_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

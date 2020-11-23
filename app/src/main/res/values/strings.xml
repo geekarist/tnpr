@@ -2,9 +2,12 @@
     <string name="app_name">AndroCommut</string>
     <string name="od_origin">Origin</string>
     <string name="od_destination">Destination</string>
-    <string name="od_instructions">Please choose an origin and a destination</string>
+    <string name="od_default_instructions">Please choose an origin and a destination</string>
     <string name="od_search">Search</string>
     <string name="autosuggest_place">Place</string>
     <string name="autosuggest_search_query">Search query</string>
     <string name="autosuggest_unknown_place">Unknown place</string>
+    <string name="od_origin_instructions">Please choose an origin</string>
+    <string name="od_destination_instructions">Please choose a destination</string>
+    <string name="od_ready_instructions">You\'ve chosen well. Let\'s go!</string>
 </resources>

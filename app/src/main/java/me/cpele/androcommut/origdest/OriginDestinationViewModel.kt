@@ -1,5 +1,6 @@
 package me.cpele.androcommut.origdest
 
+import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,11 +10,20 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.cpele.afk.Event
 import me.cpele.afk.Model
+import me.cpele.androcommut.R
 import me.cpele.androcommut.origdest.OriginDestinationViewModel.*
 
-class OriginDestinationViewModel : ViewModel(), Model<Intention, State, Effect> {
+class OriginDestinationViewModel(private val app: Application) : ViewModel(),
+    Model<Intention, State, Effect> {
 
-    private val _stateLive = MutableLiveData(State(null, null))
+    private val _stateLive =
+        MutableLiveData(
+            State(
+                origin = null,
+                destination = null,
+                instructions = app.getString(R.string.od_default_instructions)
+            )
+        )
     override val stateLive: LiveData<State> get() = _stateLive
 
     private val _effectLive = MutableLiveData<Event<Effect>>()
@@ -26,10 +36,7 @@ class OriginDestinationViewModel : ViewModel(), Model<Intention, State, Effect> 
             val state = stateLive.value
 
             val (effect, newState) = when (intention) {
-                is Intention.Load -> null to state?.copy(
-                    origin = intention.origin ?: state.origin,
-                    destination = intention.destination ?: state.destination
-                )
+                is Intention.Load -> null to state?.process(intention)
                 is Intention.OriginClicked -> Effect.NavigateToAutosuggest.Origin to state
                 is Intention.DestinationClicked -> Effect.NavigateToAutosuggest.Destination to state
             }
@@ -41,6 +48,19 @@ class OriginDestinationViewModel : ViewModel(), Model<Intention, State, Effect> 
         }
     }
 
+    private fun State.process(
+        intention: Intention.Load
+    ): State? = copy(
+        origin = intention.origin ?: origin,
+        destination = intention.destination ?: destination,
+        instructions = when {
+            intention.origin == null && intention.destination == null -> app.getString(R.string.od_default_instructions)
+            intention.origin == null -> app.getString(R.string.od_origin_instructions)
+            intention.destination == null -> app.getString(R.string.od_destination_instructions)
+            else -> app.getString(R.string.od_ready_instructions)
+        }
+    )
+
     sealed class Intention {
 
         data class Load(val origin: String?, val destination: String?) : Intention()
@@ -49,7 +69,11 @@ class OriginDestinationViewModel : ViewModel(), Model<Intention, State, Effect> 
         object DestinationClicked : Intention()
     }
 
-    data class State(val origin: String? = null, val destination: String? = null)
+    data class State(
+        val origin: String?,
+        val destination: String?,
+        val instructions: CharSequence
+    )
 
     sealed class Effect {
 

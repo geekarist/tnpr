@@ -7,8 +7,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import me.cpele.afk.ViewModelFactory
 import me.cpele.androcommut.R
 import me.cpele.androcommut.origdest.OriginDestinationViewModel.Effect
 
@@ -18,10 +20,18 @@ class OriginDestinationFragment : Fragment() {
         fun newInstance() = OriginDestinationFragment()
     }
 
-    private lateinit var viewModel: OriginDestinationViewModel
+    private val viewModel: OriginDestinationViewModel by viewModels {
+        ViewModelFactory {
+            OriginDestinationViewModel(
+                activity?.application
+                    ?: throw IllegalStateException("Parent Activity of ${this::class.qualifiedName} should be attached")
+            )
+        }
+    }
 
     private lateinit var originButton: Button
     private lateinit var destinationButton: Button
+    private lateinit var instructionsText: TextView
 
     private var listener: Listener? = null
 
@@ -32,8 +42,6 @@ class OriginDestinationFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-
-        viewModel = ViewModelProvider(this).get(OriginDestinationViewModel::class.java)
 
         listener = context as? Listener
             ?: throw IllegalStateException(
@@ -47,6 +55,7 @@ class OriginDestinationFragment : Fragment() {
 
         originButton = view.findViewById(R.id.od_origin_button)
         destinationButton = view.findViewById(R.id.od_destination_button)
+        instructionsText = view.findViewById(R.id.od_instructions_text)
 
         val intention = OriginDestinationFragmentArgs
             .fromBundle(requireArguments())
@@ -62,6 +71,7 @@ class OriginDestinationFragment : Fragment() {
         viewModel.stateLive.observe(viewLifecycleOwner) { state ->
             originButton.text = state?.origin
             destinationButton.text = state?.destination
+            instructionsText.text = state?.instructions
         }
 
         viewModel.effectLive.observe(viewLifecycleOwner) { event ->
