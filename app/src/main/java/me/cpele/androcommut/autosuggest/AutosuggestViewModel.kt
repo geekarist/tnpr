@@ -14,7 +14,6 @@ import me.cpele.afk.Outcome
 import me.cpele.androcommut.BuildConfig
 import me.cpele.androcommut.NavitiaPlacesResult
 import me.cpele.androcommut.NavitiaService
-import me.cpele.androcommut.R
 import me.cpele.androcommut.autosuggest.AutosuggestViewModel.*
 
 @FlowPreview
@@ -37,7 +36,7 @@ class AutosuggestViewModel(
             .flowOn(Dispatchers.Default)
             .map { query -> fetchPlaces(query) }
             .flowOn(Dispatchers.IO)
-            .map { result -> mapResultToUiModels(result) }
+            .map { result -> result.toUiModels() }
             .flowOn(Dispatchers.Default)
             .onEach { placeUiModels ->
                 val currentState = stateLive.value
@@ -56,14 +55,16 @@ class AutosuggestViewModel(
             Outcome.Failure(t)
         }
 
-    private fun mapResultToUiModels(result: Outcome<NavitiaPlacesResult>): List<PlaceUiModel> =
-        when (result) {
-            is Outcome.Success -> result.value.places.map { navitiaPlace ->
+    private fun Outcome<NavitiaPlacesResult>.toUiModels(): List<PlaceUiModel> =
+        when (this) {
+            is Outcome.Success -> value.places.map { navitiaPlace ->
                 PlaceUiModel(
+                    id = navitiaPlace.id
+                        ?: throw IllegalStateException("Place has no id: $navitiaPlace"),
+                    name = navitiaPlace.name
+                        ?: throw IllegalStateException("Place has no name: $navitiaPlace"),
                     label = navitiaPlace.label
                         ?: navitiaPlace.name
-                        ?: navitiaPlace.id
-                        ?: application.getString(R.string.autosuggest_unknown_place)
                 )
             }
             is Outcome.Failure -> emptyList()
