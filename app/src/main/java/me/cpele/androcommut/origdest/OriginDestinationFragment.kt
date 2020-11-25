@@ -10,6 +10,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import me.cpele.afk.Event
 import me.cpele.afk.ViewModelFactory
 import me.cpele.androcommut.R
 import me.cpele.androcommut.origdest.OriginDestinationViewModel.Effect
@@ -53,10 +54,6 @@ class OriginDestinationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        originButton = view.findViewById(R.id.od_origin_button)
-        destinationButton = view.findViewById(R.id.od_destination_button)
-        instructionsText = view.findViewById(R.id.od_instructions_text)
-
         val intention = OriginDestinationFragmentArgs
             .fromBundle(requireArguments())
             .let { args ->
@@ -68,22 +65,12 @@ class OriginDestinationFragment : Fragment() {
 
         viewModel.dispatch(intention)
 
-        viewModel.stateLive.observe(viewLifecycleOwner) { state ->
-            originButton.text = state?.origin
-            destinationButton.text = state?.destination
-            instructionsText.text = state?.instructions
-        }
+        originButton = view.findViewById(R.id.od_origin_button)
+        destinationButton = view.findViewById(R.id.od_destination_button)
+        instructionsText = view.findViewById(R.id.od_instructions_text)
 
-        viewModel.effectLive.observe(viewLifecycleOwner) { event ->
-            event.consume { effect ->
-                when (effect) {
-                    is Effect.NavigateToAutosuggest.Origin ->
-                        listener?.openAutosuggestOrigin(this)
-                    is Effect.NavigateToAutosuggest.Destination ->
-                        listener?.openAutosuggestDestination(this)
-                }
-            }
-        }
+        viewModel.stateLive.observe(viewLifecycleOwner) { state -> renderState(state) }
+        viewModel.effectLive.observe(viewLifecycleOwner) { event -> renderEvent(event) }
 
         originButton.setOnClickListener {
             viewModel.dispatch(OriginDestinationViewModel.Intention.OriginClicked)
@@ -91,6 +78,23 @@ class OriginDestinationFragment : Fragment() {
 
         destinationButton.setOnClickListener {
             viewModel.dispatch(OriginDestinationViewModel.Intention.DestinationClicked)
+        }
+    }
+
+    private fun renderState(state: OriginDestinationViewModel.State?) {
+        originButton.text = state?.origin
+        destinationButton.text = state?.destination
+        instructionsText.text = state?.instructions
+    }
+
+    private fun renderEvent(event: Event<Effect>) {
+        event.consume { effect ->
+            when (effect) {
+                is Effect.NavigateToAutosuggest.Origin ->
+                    listener?.openAutosuggestOrigin(this)
+                is Effect.NavigateToAutosuggest.Destination ->
+                    listener?.openAutosuggestDestination(this)
+            }
         }
     }
 
