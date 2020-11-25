@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import me.cpele.afk.Event
 import me.cpele.afk.ViewModelFactory
+import me.cpele.afk.exhaust
 import me.cpele.androcommut.R
 import me.cpele.androcommut.origdest.OriginDestinationViewModel.Effect
 
@@ -33,6 +34,7 @@ class OriginDestinationFragment : Fragment() {
     private lateinit var originButton: Button
     private lateinit var destinationButton: Button
     private lateinit var instructionsText: TextView
+    private lateinit var actionButton: View
 
     private var listener: Listener? = null
 
@@ -68,6 +70,7 @@ class OriginDestinationFragment : Fragment() {
         originButton = view.findViewById(R.id.od_origin_button)
         destinationButton = view.findViewById(R.id.od_destination_button)
         instructionsText = view.findViewById(R.id.od_instructions_text)
+        actionButton = view.findViewById(R.id.od_action_button)
 
         viewModel.stateLive.observe(viewLifecycleOwner) { state -> renderState(state) }
         viewModel.effectLive.observe(viewLifecycleOwner) { event -> renderEvent(event) }
@@ -78,6 +81,10 @@ class OriginDestinationFragment : Fragment() {
 
         destinationButton.setOnClickListener {
             viewModel.dispatch(OriginDestinationViewModel.Intention.DestinationClicked)
+        }
+
+        actionButton.setOnClickListener {
+            viewModel.dispatch(OriginDestinationViewModel.Intention.ActionClicked)
         }
     }
 
@@ -94,7 +101,9 @@ class OriginDestinationFragment : Fragment() {
                     listener?.openAutosuggestOrigin(this)
                 is Effect.NavigateToAutosuggest.Destination ->
                     listener?.openAutosuggestDestination(this)
-            }
+                is Effect.NavigateToTrip ->
+                    listener?.openTrip(effect.origin, effect.destination)
+            }?.exhaust()
         }
     }
 
@@ -106,5 +115,6 @@ class OriginDestinationFragment : Fragment() {
     interface Listener {
         fun openAutosuggestOrigin(fragment: Fragment)
         fun openAutosuggestDestination(fragment: Fragment)
+        fun openTrip(origin: String, destination: String)
     }
 }

@@ -39,6 +39,12 @@ class OriginDestinationViewModel(private val app: Application) : ViewModel(),
                 is Intention.Load -> null to state?.process(intention)
                 is Intention.OriginClicked -> Effect.NavigateToAutosuggest.Origin to state
                 is Intention.DestinationClicked -> Effect.NavigateToAutosuggest.Destination to state
+                is Intention.ActionClicked -> Effect.NavigateToTrip(
+                    origin = state?.origin
+                        ?: throw IllegalStateException("State is missing an origin: $state"),
+                    destination = state.destination
+                        ?: throw IllegalStateException("State is missing a destination: $state")
+                ) to state
             }
 
             withContext(Dispatchers.Main) {
@@ -50,7 +56,7 @@ class OriginDestinationViewModel(private val app: Application) : ViewModel(),
 
     private fun State.process(
         intention: Intention.Load
-    ): State? = copy(
+    ): State = copy(
         origin = intention.origin ?: origin,
         destination = intention.destination ?: destination,
         instructions = when {
@@ -67,6 +73,7 @@ class OriginDestinationViewModel(private val app: Application) : ViewModel(),
 
         object OriginClicked : Intention()
         object DestinationClicked : Intention()
+        object ActionClicked : Intention()
     }
 
     data class State(
@@ -81,5 +88,7 @@ class OriginDestinationViewModel(private val app: Application) : ViewModel(),
             object Origin : NavigateToAutosuggest()
             object Destination : NavigateToAutosuggest()
         }
+
+        data class NavigateToTrip(val origin: String, val destination: String) : Effect()
     }
 }
