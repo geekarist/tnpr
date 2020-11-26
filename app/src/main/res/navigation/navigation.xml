@@ -14,8 +14,8 @@
             android:id="@+id/action_originDestination_to_autosuggest"
             app:destination="@id/autosuggestFragment" />
         <action
-            android:id="@+id/action_originDestinationFragment_to_journeysFragment2"
-            app:destination="@id/journeysFragment" />
+            android:id="@+id/action_originDestination_to_trip_selection"
+            app:destination="@id/tripSelectionFragment" />
         <argument
             android:name="origin"
             android:defaultValue="@null"
@@ -42,13 +42,19 @@
             app:argType="me.cpele.androcommut.autosuggest.AutosuggestTrigger" />
     </fragment>
     <fragment
-        android:id="@+id/journeysFragment"
-        android:name="me.cpele.androcommut.journeys.JourneysFragment"
+        android:id="@+id/tripSelectionFragment"
+        android:name="me.cpele.androcommut.tripselection.TripSelectionFragment"
         android:label="journeys_fragment"
-        tools:layout="@layout/journeys_fragment">
+        tools:layout="@layout/trip_selection_fragment">
         <action
             android:id="@+id/action_journeysFragment_to_roadmapFragment"
             app:destination="@id/roadmapFragment" />
+        <argument
+            android:name="origin"
+            app:argType="string" />
+        <argument
+            android:name="destination"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/roadmapFragment"

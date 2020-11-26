@@ -1,7 +1,6 @@
 package me.cpele.androcommut
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -56,13 +55,13 @@ class MainActivity : AppCompatActivity(),
             )
         )
 
-    override fun openTrip(origin: String, destination: String) {
-        Toast.makeText(
-            application,
-            "To do: display trip from $origin to $destination",
-            Toast.LENGTH_SHORT
-        ).show()
-    }
+    override fun openTrip(fragment: Fragment, origin: String, destination: String) =
+        fragment.findNavController().navigate(
+            OriginDestinationFragmentDirections.actionOriginDestinationToTripSelection(
+                origin,
+                destination
+            )
+        )
 
     override fun takeAutosuggestion(
         fragment: Fragment,

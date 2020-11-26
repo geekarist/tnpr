@@ -102,7 +102,7 @@ class OriginDestinationFragment : Fragment() {
                 is Effect.NavigateToAutosuggest.Destination ->
                     listener?.openAutosuggestDestination(this)
                 is Effect.NavigateToTrip ->
-                    listener?.openTrip(effect.origin, effect.destination)
+                    listener?.openTrip(this, effect.origin, effect.destination)
             }?.exhaust()
         }
     }
@@ -115,6 +115,6 @@ class OriginDestinationFragment : Fragment() {
     interface Listener {
         fun openAutosuggestOrigin(fragment: Fragment)
         fun openAutosuggestDestination(fragment: Fragment)
-        fun openTrip(origin: String, destination: String)
+        fun openTrip(fragment: Fragment, origin: String, destination: String)
     }
 }
