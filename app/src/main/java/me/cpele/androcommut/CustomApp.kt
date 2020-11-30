@@ -7,6 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 class CustomApp : Application() {
 
     lateinit var navitiaService: NavitiaService
+        private set
 
     override fun onCreate() {
         super.onCreate()

@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import me.cpele.afk.ViewModelFactory
+import me.cpele.androcommut.CustomApp
 import me.cpele.androcommut.R
+import me.cpele.androcommut.tripselection.TripSelectionViewModel.Intention
 
 class TripSelectionFragment : Fragment() {
 
@@ -15,7 +17,13 @@ class TripSelectionFragment : Fragment() {
         fun newInstance() = TripSelectionFragment()
     }
 
-    private lateinit var viewModel: TripSelectionViewModel
+    private val viewModel: TripSelectionViewModel by viewModels {
+        ViewModelFactory {
+            TripSelectionViewModel(
+                CustomApp.instance.navitiaService
+            )
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,15 +40,6 @@ class TripSelectionFragment : Fragment() {
             ?.apply { origin to destination }
             ?: throw IllegalArgumentException("Arguments must not be null")
 
-        Toast.makeText(
-            context,
-            "Origin: $origin, destination: $destination",
-            Toast.LENGTH_SHORT
-        ).show()
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(TripSelectionViewModel::class.java)
+        viewModel.dispatch(Intention.Load(origin, destination))
     }
 }
