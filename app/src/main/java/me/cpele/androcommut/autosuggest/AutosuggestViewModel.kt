@@ -34,6 +34,7 @@ class AutosuggestViewModel(
     init {
         queryFlow.debounce(1000)
             .flowOn(Dispatchers.Default)
+            .filterNotNull()
             .map { query -> fetchPlaces(query) }
             .flowOn(Dispatchers.IO)
             .map { result -> result.toUiModels() }
@@ -47,7 +48,7 @@ class AutosuggestViewModel(
             .launchIn(viewModelScope)
     }
 
-    private suspend fun fetchPlaces(query: String?): Outcome<NavitiaPlacesResult> =
+    private suspend fun fetchPlaces(query: String): Outcome<NavitiaPlacesResult> =
         try {
             val response = navitiaService.places(auth = BuildConfig.NAVITIA_API_KEY, q = query)
             Outcome.Success(response)
