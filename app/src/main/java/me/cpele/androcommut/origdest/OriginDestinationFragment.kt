@@ -60,8 +60,10 @@ class OriginDestinationFragment : Fragment() {
             .fromBundle(requireArguments())
             .let { args ->
                 OriginDestinationViewModel.Intention.Load(
-                    args.origin,
-                    args.destination
+                    args.originId,
+                    args.originLabel,
+                    args.destinationId,
+                    args.destinationLabel
                 )
             }
 
@@ -89,8 +91,8 @@ class OriginDestinationFragment : Fragment() {
     }
 
     private fun renderState(state: OriginDestinationViewModel.State?) {
-        originButton.text = state?.origin
-        destinationButton.text = state?.destination
+        originButton.text = state?.originLabel
+        destinationButton.text = state?.destinationLabel
         instructionsText.text = state?.instructions
     }
 
@@ -102,7 +104,13 @@ class OriginDestinationFragment : Fragment() {
                 is Effect.NavigateToAutosuggest.Destination ->
                     listener?.openAutosuggestDestination(this)
                 is Effect.NavigateToTrip ->
-                    listener?.openTrip(this, effect.origin, effect.destination)
+                    listener?.openTrip(
+                        this,
+                        effect.originId,
+                        effect.originLabel,
+                        effect.destinationId,
+                        effect.destinationLabel
+                    )
             }?.exhaust()
         }
     }
@@ -113,8 +121,17 @@ class OriginDestinationFragment : Fragment() {
     }
 
     interface Listener {
+
         fun openAutosuggestOrigin(fragment: Fragment)
+
         fun openAutosuggestDestination(fragment: Fragment)
-        fun openTrip(fragment: Fragment, origin: String, destination: String)
+
+        fun openTrip(
+            fragment: Fragment,
+            originId: String,
+            originLabel: String,
+            destinationId: String,
+            destinationLabel: String
+        )
     }
 }

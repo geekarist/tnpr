@@ -19,8 +19,10 @@ class OriginDestinationViewModel(private val app: Application) : ViewModel(),
     private val _stateLive =
         MutableLiveData(
             State(
-                origin = null,
-                destination = null,
+                originId = null,
+                originLabel = null,
+                destinationId = null,
+                destinationLabel = null,
                 instructions = app.getString(R.string.od_default_instructions)
             )
         )
@@ -40,10 +42,14 @@ class OriginDestinationViewModel(private val app: Application) : ViewModel(),
                 is Intention.OriginClicked -> Effect.NavigateToAutosuggest.Origin to state
                 is Intention.DestinationClicked -> Effect.NavigateToAutosuggest.Destination to state
                 is Intention.ActionClicked -> Effect.NavigateToTrip(
-                    origin = state?.origin
-                        ?: throw IllegalStateException("State is missing an origin: $state"),
-                    destination = state.destination
-                        ?: throw IllegalStateException("State is missing a destination: $state")
+                    originId = state?.originId
+                        ?: throw IllegalStateException("State is missing an origin ID: $state"),
+                    originLabel = state.originLabel
+                        ?: throw IllegalStateException("State is missing an origin label: $state"),
+                    destinationId = state.destinationId
+                        ?: throw IllegalStateException("State is missing a destination ID: $state"),
+                    destinationLabel = state.destinationLabel
+                        ?: throw IllegalStateException("State is missing a destination label: $state")
                 ) to state
             }
 
@@ -57,19 +63,26 @@ class OriginDestinationViewModel(private val app: Application) : ViewModel(),
     private fun State.process(
         intention: Intention.Load
     ): State = copy(
-        origin = intention.origin ?: origin,
-        destination = intention.destination ?: destination,
+        originId = intention.originId ?: originId,
+        originLabel = intention.originLabel ?: originLabel,
+        destinationId = intention.destinationId ?: destinationId,
+        destinationLabel = intention.destinationLabel ?: destinationLabel,
         instructions = when {
-            intention.origin == null && intention.destination == null -> app.getString(R.string.od_default_instructions)
-            intention.origin == null -> app.getString(R.string.od_origin_instructions)
-            intention.destination == null -> app.getString(R.string.od_destination_instructions)
+            intention.originLabel == null && intention.destinationLabel == null -> app.getString(R.string.od_default_instructions)
+            intention.originLabel == null -> app.getString(R.string.od_origin_instructions)
+            intention.destinationLabel == null -> app.getString(R.string.od_destination_instructions)
             else -> app.getString(R.string.od_ready_instructions)
         }
     )
 
     sealed class Intention {
 
-        data class Load(val origin: String?, val destination: String?) : Intention()
+        data class Load(
+            val originId: String?,
+            val originLabel: String?,
+            val destinationId: String?,
+            val destinationLabel: String?
+        ) : Intention()
 
         object OriginClicked : Intention()
         object DestinationClicked : Intention()
@@ -77,8 +90,10 @@ class OriginDestinationViewModel(private val app: Application) : ViewModel(),
     }
 
     data class State(
-        val origin: String?,
-        val destination: String?,
+        val originId: String?,
+        val originLabel: String?,
+        val destinationId: String?,
+        val destinationLabel: String?,
         val instructions: CharSequence
     )
 
@@ -89,6 +104,11 @@ class OriginDestinationViewModel(private val app: Application) : ViewModel(),
             object Destination : NavigateToAutosuggest()
         }
 
-        data class NavigateToTrip(val origin: String, val destination: String) : Effect()
+        data class NavigateToTrip(
+            val originId: String,
+            val originLabel: String,
+            val destinationId: String,
+            val destinationLabel: String
+        ) : Effect()
     }
 }

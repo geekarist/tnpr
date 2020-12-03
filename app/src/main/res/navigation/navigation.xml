@@ -17,12 +17,22 @@
             android:id="@+id/action_originDestination_to_trip_selection"
             app:destination="@id/tripSelectionFragment" />
         <argument
-            android:name="origin"
+            android:name="originId"
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
         <argument
-            android:name="destination"
+            android:name="originLabel"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="destinationId"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="destinationLabel"
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
@@ -50,10 +60,16 @@
             android:id="@+id/action_journeysFragment_to_roadmapFragment"
             app:destination="@id/roadmapFragment" />
         <argument
-            android:name="origin"
+            android:name="originId"
             app:argType="string" />
         <argument
-            android:name="destination"
+            android:name="originLabel"
+            app:argType="string" />
+        <argument
+            android:name="destinationId"
+            app:argType="string" />
+        <argument
+            android:name="destinationLabel"
             app:argType="string" />
     </fragment>
     <fragment

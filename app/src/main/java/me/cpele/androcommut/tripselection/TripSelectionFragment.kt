@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import me.cpele.afk.ViewModelFactory
-import me.cpele.androcommut.CustomApp
 import me.cpele.androcommut.R
 import me.cpele.androcommut.tripselection.TripSelectionViewModel.Intention
 
@@ -19,9 +18,7 @@ class TripSelectionFragment : Fragment() {
 
     private val viewModel: TripSelectionViewModel by viewModels {
         ViewModelFactory {
-            TripSelectionViewModel(
-                CustomApp.instance.navitiaService
-            )
+            TripSelectionViewModel()
         }
     }
 
@@ -35,11 +32,18 @@ class TripSelectionFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val (origin, destination) = arguments
+        val intention = arguments
             ?.let { TripSelectionFragmentArgs.fromBundle(it) }
-            ?.apply { origin to destination }
+            ?.let {
+                Intention.Load(
+                    it.originId,
+                    it.originLabel,
+                    it.destinationId,
+                    it.destinationLabel
+                )
+            }
             ?: throw IllegalArgumentException("Arguments must not be null")
 
-        viewModel.dispatch(Intention.Load(origin, destination))
+        viewModel.dispatch(intention)
     }
 }

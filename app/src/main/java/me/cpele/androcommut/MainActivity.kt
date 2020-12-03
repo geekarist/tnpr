@@ -31,7 +31,9 @@ class MainActivity : AppCompatActivity(),
                         val fragment = supportFragmentManager.findFragmentById(effect.fragmentId)
                         fragment?.findNavController()?.navigate(
                             AutosuggestFragmentDirections.actionAutosuggestFragmentToOriginDestinationFragment(
+                                effect.originId,
                                 effect.originLabel,
+                                effect.destinationId,
                                 effect.destinationLabel
                             )
                         )
@@ -55,17 +57,26 @@ class MainActivity : AppCompatActivity(),
             )
         )
 
-    override fun openTrip(fragment: Fragment, origin: String, destination: String) =
+    override fun openTrip(
+        fragment: Fragment,
+        originId: String,
+        originLabel: String,
+        destinationId: String,
+        destinationLabel: String
+    ) =
         fragment.findNavController().navigate(
             OriginDestinationFragmentDirections.actionOriginDestinationToTripSelection(
-                origin,
-                destination
+                originId,
+                originLabel,
+                destinationId,
+                destinationLabel
             )
         )
 
     override fun takeAutosuggestion(
         fragment: Fragment,
         trigger: AutosuggestTrigger,
+        id: String,
         label: String
-    ) = viewModel.dispatch(MainViewModel.Intention.Suggestion(fragment.id, trigger, label))
+    ) = viewModel.dispatch(MainViewModel.Intention.Suggestion(fragment.id, trigger, id, label))
 }

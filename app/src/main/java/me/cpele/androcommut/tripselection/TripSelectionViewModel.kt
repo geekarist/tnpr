@@ -6,10 +6,9 @@ import androidx.lifecycle.ViewModel
 import me.cpele.afk.Event
 import me.cpele.afk.Model
 import me.cpele.afk.exhaust
-import me.cpele.androcommut.NavitiaService
 import me.cpele.androcommut.tripselection.TripSelectionViewModel.*
 
-class TripSelectionViewModel(navitiaService: NavitiaService) :
+class TripSelectionViewModel :
     ViewModel(),
     Model<Intention, State, Effect> {
 
@@ -17,7 +16,8 @@ class TripSelectionViewModel(navitiaService: NavitiaService) :
         when (intention) {
             is Intention.Load -> Log.d(
                 javaClass.simpleName,
-                "Origin: ${intention.origin}, destination: ${intention.destination}"
+                "Origin is ${intention.originId}: ${intention.originLabel}, " +
+                        "destination is: ${intention.destinationId}: ${intention.destinationLabel}"
             )
         }.exhaust()
     }
@@ -29,7 +29,12 @@ class TripSelectionViewModel(navitiaService: NavitiaService) :
         get() = TODO("Not yet implemented")
 
     sealed class Intention {
-        data class Load(val origin: String, val destination: String) : Intention()
+        data class Load(
+            val originId: String,
+            val originLabel: String,
+            val destinationId: String,
+            val destinationLabel: String
+        ) : Intention()
     }
 
     class State {

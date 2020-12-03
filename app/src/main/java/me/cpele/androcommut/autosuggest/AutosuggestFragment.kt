@@ -60,6 +60,7 @@ class AutosuggestFragment : Fragment() {
             listener?.takeAutosuggestion(
                 this,
                 args.trigger,
+                uiModel.id,
                 uiModel.label
             )
         }
@@ -77,6 +78,11 @@ class AutosuggestFragment : Fragment() {
     }
 
     interface Listener {
-        fun takeAutosuggestion(fragment: Fragment, trigger: AutosuggestTrigger, label: String)
+        fun takeAutosuggestion(
+            fragment: Fragment,
+            trigger: AutosuggestTrigger,
+            id: String,
+            label: String
+        )
     }
 }

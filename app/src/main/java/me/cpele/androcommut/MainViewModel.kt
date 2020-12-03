@@ -27,19 +27,25 @@ class MainViewModel : ViewModel(), Model<Intention, State, Effect> {
                 when (intention.trigger) {
                     AutosuggestTrigger.ORIGIN -> Effect.SuggestionIdentified(
                         intention.fragmentId,
+                        intention.id,
                         intention.label,
+                        state?.destinationId,
                         state?.destinationLabel
                     )
                     AutosuggestTrigger.DESTINATION -> Effect.SuggestionIdentified(
                         intention.fragmentId,
+                        state?.originId,
                         state?.originLabel,
+                        intention.id,
                         intention.label
                     )
                 }
         }
 
         val newState = state?.copy(
+            originId = effect.originId,
             originLabel = effect.originLabel,
+            destinationId = effect.destinationId,
             destinationLabel = effect.destinationLabel
         )
 
@@ -51,6 +57,7 @@ class MainViewModel : ViewModel(), Model<Intention, State, Effect> {
         data class Suggestion(
             val fragmentId: Int,
             val trigger: AutosuggestTrigger,
+            val id: String,
             val label: String
         ) : Intention()
     }
@@ -58,7 +65,9 @@ class MainViewModel : ViewModel(), Model<Intention, State, Effect> {
     sealed class Effect {
         data class SuggestionIdentified(
             val fragmentId: Int,
+            val originId: String?,
             val originLabel: String?,
+            val destinationId: String?,
             val destinationLabel: String?
         ) : Effect()
 
@@ -66,6 +75,8 @@ class MainViewModel : ViewModel(), Model<Intention, State, Effect> {
 
     data class State(
         val originLabel: String? = null,
-        val destinationLabel: String? = null
+        val destinationLabel: String? = null,
+        val originId: String? = null,
+        val destinationId: String? = null
     )
 }
