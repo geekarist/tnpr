@@ -13,7 +13,7 @@ class TripSelectionViewModel :
     Model<Intention, State, Effect> {
 
     override fun dispatch(intention: Intention) {
-        when (intention) {
+        when (intention) { // TODO: Don't over engineer: `dispatch()`, `Intention`, `State` and `Effect` are enough! Pure functions or middlewares are too much.
             is Intention.Load -> Log.d(
                 javaClass.simpleName,
                 "Origin is ${intention.originId}: ${intention.originLabel}, " +
