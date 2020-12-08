@@ -8,8 +8,8 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import me.cpele.afk.Component
 import me.cpele.afk.Event
-import me.cpele.afk.Model
 import me.cpele.afk.Outcome
 import me.cpele.androcommut.BuildConfig
 import me.cpele.androcommut.NavitiaPlacesResult
@@ -20,7 +20,7 @@ import me.cpele.androcommut.autosuggest.AutosuggestViewModel.*
 class AutosuggestViewModel(
     private val navitiaService: NavitiaService,
     private val application: Application
-) : ViewModel(), Model<Intention, State, Effect> {
+) : ViewModel(), Component<Intention, State, Effect> {
 
     private val _stateLive = MutableLiveData<State>().apply { value = State(emptyList()) }
     override val stateLive: LiveData<State>

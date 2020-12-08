@@ -8,13 +8,13 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.cpele.afk.Component
 import me.cpele.afk.Event
-import me.cpele.afk.Model
 import me.cpele.androcommut.R
 import me.cpele.androcommut.origdest.OriginDestinationViewModel.*
 
 class OriginDestinationViewModel(private val app: Application) : ViewModel(),
-    Model<Intention, State, Effect> {
+    Component<Intention, State, Effect> {
 
     private val _stateLive =
         MutableLiveData(

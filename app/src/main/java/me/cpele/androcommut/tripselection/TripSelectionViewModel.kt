@@ -3,14 +3,14 @@ package me.cpele.androcommut.tripselection
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import me.cpele.afk.Component
 import me.cpele.afk.Event
-import me.cpele.afk.Model
 import me.cpele.afk.exhaust
 import me.cpele.androcommut.tripselection.TripSelectionViewModel.*
 
 class TripSelectionViewModel :
     ViewModel(),
-    Model<Intention, State, Effect> {
+    Component<Intention, State, Effect> {
 
     override fun dispatch(intention: Intention) {
         when (intention) { // TODO: Don't over engineer: `dispatch()`, `Intention`, `State` and `Effect` are enough! Pure functions or middlewares are too much.

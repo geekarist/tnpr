@@ -3,12 +3,12 @@ package me.cpele.androcommut
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import me.cpele.afk.Component
 import me.cpele.afk.Event
-import me.cpele.afk.Model
 import me.cpele.androcommut.MainViewModel.*
 import me.cpele.androcommut.autosuggest.AutosuggestTrigger
 
-class MainViewModel : ViewModel(), Model<Intention, State, Effect> {
+class MainViewModel : ViewModel(), Component<Intention, State, Effect> {
 
     private val _stateLive = MutableLiveData(State())
     override val stateLive: LiveData<State>
