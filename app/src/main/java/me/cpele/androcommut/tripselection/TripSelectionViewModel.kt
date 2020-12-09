@@ -18,13 +18,13 @@ import me.cpele.androcommut.tripselection.TripSelectionViewModel.*
 
 class TripSelectionViewModel(
     private val navitiaService: NavitiaService
-) : ViewModel(), Component<Intention, State, Effect> {
+) : ViewModel(), Component<Intention, State, Consequence> {
 
     private val _stateLive = MutableLiveData(State())
     override val stateLive: LiveData<State>
         get() = _stateLive
 
-    override val effectLive: LiveData<Event<Effect>>
+    override val eventLive: LiveData<Event<Consequence>>
         get() = TODO("Not yet implemented")
 
     override fun dispatch(intention: Intention) {
@@ -48,12 +48,25 @@ class TripSelectionViewModel(
             )
         }
 
-        val model = navitiaResponse.toUiModel()
+        val state = stateLive.value
+
+        val model = state?.copy(uiModels = navitiaResponse.toUiModels())
 
         withContext(Dispatchers.Main) {
             _stateLive.value = model
         }
     }
+
+    private fun NavitiaJourneysResult.toUiModels(): List<UiModel> =
+        remoteJourneys?.map { remoteJourney ->
+            val remoteSections = remoteJourney.sections
+            val legs = remoteSections?.map { remoteSection ->
+                val remoteDuration = remoteSection.duration
+                val duration = remoteDuration?.toString() ?: "Unknown duration"
+                UiModel.Leg(duration)
+            }
+            UiModel(legs ?: emptyList())
+        } ?: emptyList()
 
     sealed class Intention {
         data class Load(
@@ -65,17 +78,15 @@ class TripSelectionViewModel(
     }
 
     data class State(
-        val tripUiModels: List<TripUiModel>? = null
+        val uiModels: List<UiModel>? = null
     )
 
-    sealed class Effect {
+    sealed class Consequence {
     }
 
-    data class TripUiModel(
-        val xx: String = TODO()
-    )
-}
-
-private fun NavitiaJourneysResult.toUiModel(): State? {
-    TODO("Not yet implemented")
+    data class UiModel(
+        val legs: List<Leg>
+    ) {
+        data class Leg(val duration: String)
+    }
 }

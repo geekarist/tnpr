@@ -29,7 +29,7 @@ class OriginDestinationViewModel(private val app: Application) : ViewModel(),
     override val stateLive: LiveData<State> get() = _stateLive
 
     private val _effectLive = MutableLiveData<Event<Effect>>()
-    override val effectLive: LiveData<Event<Effect>> get() = _effectLive
+    override val eventLive: LiveData<Event<Effect>> get() = _effectLive
 
     override fun dispatch(intention: Intention) {
 

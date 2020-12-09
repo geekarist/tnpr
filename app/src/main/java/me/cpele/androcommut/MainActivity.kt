@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
 
-        viewModel.effectLive.observe(this) { event ->
+        viewModel.eventLive.observe(this) { event ->
             event.consume { effect ->
                 when (effect) {
                     is MainViewModel.Effect.SuggestionIdentified -> {

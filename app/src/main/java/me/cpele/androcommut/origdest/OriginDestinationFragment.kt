@@ -75,7 +75,7 @@ class OriginDestinationFragment : Fragment() {
         actionButton = view.findViewById(R.id.od_action_button)
 
         viewModel.stateLive.observe(viewLifecycleOwner) { state -> renderState(state) }
-        viewModel.effectLive.observe(viewLifecycleOwner) { event -> renderEvent(event) }
+        viewModel.eventLive.observe(viewLifecycleOwner) { event -> renderEvent(event) }
 
         originButton.setOnClickListener {
             viewModel.dispatch(OriginDestinationViewModel.Intention.OriginClicked)

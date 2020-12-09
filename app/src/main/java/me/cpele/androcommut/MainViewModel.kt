@@ -15,7 +15,7 @@ class MainViewModel : ViewModel(), Component<Intention, State, Effect> {
         get() = TODO("Not yet implemented")
 
     private val _effectLive = MutableLiveData<Event<Effect>>()
-    override val effectLive: LiveData<Event<Effect>>
+    override val eventLive: LiveData<Event<Effect>>
         get() = _effectLive
 
     override fun dispatch(intention: Intention) {

@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
  * User facing business logic component.
  *
  * A [Component] processes [IntentionT]s.
- * It applies a some logic to it.
+ * It applies some logic to it.
  * It holds and exposes a [StateT], and produces [ConsequenceT]s.
  * The [ConsequenceT]s can be consumed via [Event].
  *
@@ -19,5 +19,5 @@ import androidx.lifecycle.LiveData
 interface Component<IntentionT, StateT, ConsequenceT> {
     fun dispatch(intention: IntentionT)
     val stateLive: LiveData<StateT>
-    val effectLive: LiveData<Event<ConsequenceT>>
+    val eventLive: LiveData<Event<ConsequenceT>>
 }

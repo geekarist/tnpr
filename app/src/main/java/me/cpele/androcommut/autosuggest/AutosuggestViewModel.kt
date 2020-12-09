@@ -26,7 +26,7 @@ class AutosuggestViewModel(
     override val stateLive: LiveData<State>
         get() = _stateLive
 
-    override val effectLive: LiveData<Event<Effect>>
+    override val eventLive: LiveData<Event<Effect>>
         get() = TODO("Not yet implemented")
 
     private val queryFlow = MutableStateFlow<String?>(null)
