@@ -63,8 +63,10 @@ class TripSelectionViewModel(
             val legs = remoteSections?.map { remoteSection ->
                 val remoteDuration = remoteSection.duration
                 val duration = remoteDuration?.toString()
-                    ?: "Unknown duration" // TODO: Extract string resource
-                UiModel.Leg(duration)
+                    ?: "Unknown duration" // TODO: Extract string resources
+                val from = remoteSection.from?.name ?: "Unknown origin"
+                val to = remoteSection.to?.name ?: "Unknown destination"
+                UiModel.Leg(duration, UiModel.Place(from), UiModel.Place(to))
             }
             UiModel(legs ?: emptyList())
         } ?: emptyList()
@@ -88,6 +90,7 @@ class TripSelectionViewModel(
     data class UiModel(
         val legs: List<Leg>
     ) {
-        data class Leg(val duration: String)
+        data class Leg(val duration: String, val origin: Place, val destination: Place)
+        data class Place(val name: String)
     }
 }
