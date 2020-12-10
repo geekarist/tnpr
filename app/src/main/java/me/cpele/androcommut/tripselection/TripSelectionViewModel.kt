@@ -58,11 +58,12 @@ class TripSelectionViewModel(
     }
 
     private fun NavitiaJourneysResult.toUiModels(): List<UiModel> =
-        remoteJourneys?.map { remoteJourney ->
+        journeys?.map { remoteJourney ->
             val remoteSections = remoteJourney.sections
             val legs = remoteSections?.map { remoteSection ->
                 val remoteDuration = remoteSection.duration
-                val duration = remoteDuration?.toString() ?: "Unknown duration"
+                val duration = remoteDuration?.toString()
+                    ?: "Unknown duration" // TODO: Extract string resource
                 UiModel.Leg(duration)
             }
             UiModel(legs ?: emptyList())

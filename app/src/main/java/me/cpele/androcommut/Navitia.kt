@@ -20,7 +20,7 @@ interface NavitiaService {
     ): NavitiaJourneysResult
 }
 
-data class NavitiaJourneysResult(val remoteJourneys: List<NavitiaJourney>?)
+data class NavitiaJourneysResult(val journeys: List<NavitiaJourney>?)
 
 data class NavitiaJourney(val sections: List<NavitiaSection>?)
 
