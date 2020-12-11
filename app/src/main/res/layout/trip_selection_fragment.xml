@@ -6,6 +6,7 @@
     tools:context=".tripselection.TripSelectionFragment">
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/trip_selection_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:listitem="@layout/journey_item_view" />

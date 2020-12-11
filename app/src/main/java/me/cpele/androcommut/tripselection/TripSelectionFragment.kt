@@ -7,6 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import me.cpele.afk.ViewModelFactory
 import me.cpele.androcommut.CustomApp
 import me.cpele.androcommut.R
@@ -24,6 +27,8 @@ class TripSelectionFragment : Fragment() {
         }
     }
 
+    private val adapter = Adapter()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -34,8 +39,13 @@ class TripSelectionFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val recyclerView: RecyclerView = view.findViewById(R.id.trip_selection_recycler)
+        recyclerView.adapter = adapter
+
         viewModel.stateLive.observe(viewLifecycleOwner) { state ->
             Log.d(javaClass.simpleName, "Received: $state")
+            val uiModels = state.uiModels
+            adapter.submitList(uiModels)
         }
 
         val intention = arguments
@@ -52,4 +62,36 @@ class TripSelectionFragment : Fragment() {
 
         viewModel.dispatch(intention)
     }
+}
+
+private class Adapter : ListAdapter<TripSelectionViewModel.UiModel, ViewHolder>(DiffCallback) {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        TODO("Not yet implemented")
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        TODO("Not yet implemented")
+    }
+}
+
+private object DiffCallback : DiffUtil.ItemCallback<TripSelectionViewModel.UiModel>() {
+
+    override fun areItemsTheSame(
+        oldItem: TripSelectionViewModel.UiModel,
+        newItem: TripSelectionViewModel.UiModel
+    ): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun areContentsTheSame(
+        oldItem: TripSelectionViewModel.UiModel,
+        newItem: TripSelectionViewModel.UiModel
+    ): Boolean {
+        TODO("Not yet implemented")
+    }
+}
+
+private class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+
 }
