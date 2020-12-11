@@ -63,12 +63,6 @@ class TripSelectionViewModel(
         }
     }
 
-    private fun Outcome<NavitiaJourneysResult>.toUiModels(): List<UiModel> =
-        when (this) {
-            is Outcome.Success -> value.toUiModels()
-            is Outcome.Failure -> emptyList()
-        }
-
     sealed class Intention {
         data class Load(
             val originId: String,
@@ -92,6 +86,12 @@ class TripSelectionViewModel(
         data class Place(val name: String)
     }
 }
+
+private fun Outcome<NavitiaJourneysResult>.toUiModels(): List<UiModel> =
+    when (this) {
+        is Outcome.Success -> value.toUiModels()
+        is Outcome.Failure -> emptyList()
+    }
 
 private fun NavitiaJourneysResult.toUiModels(): List<UiModel> =
     journeys?.map { remoteJourney ->
