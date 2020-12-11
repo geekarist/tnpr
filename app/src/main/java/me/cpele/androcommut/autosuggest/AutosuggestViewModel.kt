@@ -58,15 +58,16 @@ class AutosuggestViewModel(
 
     private fun Outcome<NavitiaPlacesResult>.toUiModels(): List<PlaceUiModel> =
         when (this) {
-            is Outcome.Success -> value.places.map { navitiaPlace ->
-                PlaceUiModel(
-                    id = navitiaPlace.id
-                        ?: throw IllegalStateException("Place has no id: $navitiaPlace"),
-                    name = navitiaPlace.name
-                        ?: throw IllegalStateException("Place has no name: $navitiaPlace"),
-                    label = navitiaPlace.name
-                )
-            }
+            is Outcome.Success ->
+                value.places?.map { navitiaPlace ->
+                    PlaceUiModel(
+                        id = navitiaPlace.id
+                            ?: throw IllegalStateException("Place has no id: $navitiaPlace"),
+                        name = navitiaPlace.name
+                            ?: throw IllegalStateException("Place has no name: $navitiaPlace"),
+                        label = navitiaPlace.name
+                    )
+                } ?: throw IllegalStateException("Result should have places: $value")
             is Outcome.Failure -> emptyList()
         }
 

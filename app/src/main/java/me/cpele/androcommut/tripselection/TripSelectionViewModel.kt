@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.cpele.afk.Component
 import me.cpele.afk.Event
+import me.cpele.afk.Outcome
 import me.cpele.afk.exhaust
 import me.cpele.androcommut.BuildConfig
 import me.cpele.androcommut.NavitiaJourneysResult
@@ -40,36 +41,33 @@ class TripSelectionViewModel(
                     "destination is: ${intention.destinationId}: ${intention.destinationLabel}"
         )
 
-        val navitiaResponse = withContext(Dispatchers.IO) {
-            navitiaService.journeys(
-                BuildConfig.NAVITIA_API_KEY,
-                intention.originId,
-                intention.destinationId
-            )
+        val navitiaOutcome = withContext(Dispatchers.IO) {
+            try {
+                val response = navitiaService.journeys(
+                    BuildConfig.NAVITIA_API_KEY,
+                    intention.originId,
+                    intention.destinationId
+                )
+                Outcome.Success(response)
+            } catch (t: Throwable) {
+                Outcome.Failure(t)
+            }
         }
 
         val state = stateLive.value
 
-        val model = state?.copy(uiModels = navitiaResponse.toUiModels())
+        val model = state?.copy(uiModels = navitiaOutcome.toUiModels())
 
         withContext(Dispatchers.Main) {
             _stateLive.value = model
         }
     }
 
-    private fun NavitiaJourneysResult.toUiModels(): List<UiModel> =
-        journeys?.map { remoteJourney ->
-            val remoteSections = remoteJourney.sections
-            val legs = remoteSections?.map { remoteSection ->
-                val remoteDuration = remoteSection.duration
-                val duration = remoteDuration?.toString()
-                    ?: "Unknown duration" // TODO: Extract string resources
-                val from = remoteSection.from?.name ?: "Unknown origin"
-                val to = remoteSection.to?.name ?: "Unknown destination"
-                UiModel.Leg(duration, UiModel.Place(from), UiModel.Place(to))
-            }
-            UiModel(legs ?: emptyList())
-        } ?: emptyList()
+    private fun Outcome<NavitiaJourneysResult>.toUiModels(): List<UiModel> =
+        when (this) {
+            is Outcome.Success -> value.toUiModels()
+            is Outcome.Failure -> emptyList()
+        }
 
     sealed class Intention {
         data class Load(
@@ -94,3 +92,17 @@ class TripSelectionViewModel(
         data class Place(val name: String)
     }
 }
+
+private fun NavitiaJourneysResult.toUiModels(): List<UiModel> =
+    journeys?.map { remoteJourney ->
+        val remoteSections = remoteJourney.sections
+        val legs = remoteSections?.map { remoteSection ->
+            val remoteDuration = remoteSection.duration
+            val duration = remoteDuration?.toString()
+                ?: "Unknown duration" // TODO: Extract string resources
+            val from = remoteSection.from?.name ?: "Unknown origin"
+            val to = remoteSection.to?.name ?: "Unknown destination"
+            UiModel.Leg(duration, UiModel.Place(from), UiModel.Place(to))
+        }
+        UiModel(legs ?: emptyList())
+    } ?: emptyList()
