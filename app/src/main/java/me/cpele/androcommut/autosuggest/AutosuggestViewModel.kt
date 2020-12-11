@@ -64,8 +64,7 @@ class AutosuggestViewModel(
                         ?: throw IllegalStateException("Place has no id: $navitiaPlace"),
                     name = navitiaPlace.name
                         ?: throw IllegalStateException("Place has no name: $navitiaPlace"),
-                    label = navitiaPlace.label
-                        ?: navitiaPlace.name
+                    label = navitiaPlace.name
                 )
             }
             is Outcome.Failure -> emptyList()
