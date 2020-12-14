@@ -56,7 +56,7 @@ class TripSelectionViewModel(
 
         val state = stateLive.value
 
-        val model = state?.copy(uiModels = navitiaOutcome.toUiModels())
+        val model = state?.copy(models = navitiaOutcome.toModels())
 
         withContext(Dispatchers.Main) {
             _stateLive.value = model
@@ -73,27 +73,42 @@ class TripSelectionViewModel(
     }
 
     data class State(
-        val uiModels: List<UiModel>? = null
+        val models: List<Model>? = null
     )
 
     sealed class Consequence {
     }
 
-    data class UiModel(
+    data class Model(
         val legs: List<Leg>
     ) {
-        data class Leg(val duration: String, val origin: Place, val destination: Place)
+        data class Leg(
+            val duration: String,
+            val origin: Place,
+            val destination: Place,
+            val mode: String,
+            val line: String
+        )
+
+        val legsSummary: CharSequence? by lazy {
+            legs.joinToString(", ") { "${it.mode} ${it.line}" }
+        }
+
+        val duration: Int by lazy {
+            legs.sumBy { it.duration }
+        }
+
         data class Place(val name: String)
     }
 }
 
-private fun Outcome<NavitiaJourneysResult>.toUiModels(): List<UiModel> =
+private fun Outcome<NavitiaJourneysResult>.toModels(): List<Model> =
     when (this) {
-        is Outcome.Success -> value.toUiModels()
+        is Outcome.Success -> value.toModels()
         is Outcome.Failure -> emptyList()
     }
 
-private fun NavitiaJourneysResult.toUiModels(): List<UiModel> =
+private fun NavitiaJourneysResult.toModels(): List<Model> =
     journeys?.map { remoteJourney ->
         val remoteSections = remoteJourney.sections
         val legs = remoteSections?.map { remoteSection ->
@@ -102,7 +117,9 @@ private fun NavitiaJourneysResult.toUiModels(): List<UiModel> =
                 ?: "Unknown duration" // TODO: Extract string resources
             val from = remoteSection.from?.name ?: "Unknown origin"
             val to = remoteSection.to?.name ?: "Unknown destination"
-            UiModel.Leg(duration, UiModel.Place(from), UiModel.Place(to))
+            val mode = remoteSection.commercial_mode?.name ?: "Unknown mode"
+            val code = remoteSection.code ?: "Unknown line"
+            Model.Leg(duration, Model.Place(from), Model.Place(to), mode, code)
         }
-        UiModel(legs ?: emptyList())
+        Model(legs ?: emptyList())
     } ?: emptyList()

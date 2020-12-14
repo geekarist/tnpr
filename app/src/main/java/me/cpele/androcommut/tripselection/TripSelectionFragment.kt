@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DiffUtil
@@ -44,7 +45,7 @@ class TripSelectionFragment : Fragment() {
 
         viewModel.stateLive.observe(viewLifecycleOwner) { state ->
             Log.d(javaClass.simpleName, "Received: $state")
-            val uiModels = state.uiModels
+            val uiModels = state.models
             adapter.submitList(uiModels)
         }
 
@@ -64,34 +65,44 @@ class TripSelectionFragment : Fragment() {
     }
 }
 
-private class Adapter : ListAdapter<TripSelectionViewModel.UiModel, ViewHolder>(DiffCallback) {
+private class Adapter : ListAdapter<TripSelectionViewModel.Model, ViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        TODO("Not yet implemented")
+        val layout = R.layout.journey_item_view
+        val inflater = LayoutInflater.from(parent.context)
+        val view = inflater.inflate(layout, parent, false)
+        return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        TODO("Not yet implemented")
+        holder.bind(getItem(position))
     }
 }
 
-private object DiffCallback : DiffUtil.ItemCallback<TripSelectionViewModel.UiModel>() {
+private object DiffCallback : DiffUtil.ItemCallback<TripSelectionViewModel.Model>() {
 
     override fun areItemsTheSame(
-        oldItem: TripSelectionViewModel.UiModel,
-        newItem: TripSelectionViewModel.UiModel
+        oldItem: TripSelectionViewModel.Model,
+        newItem: TripSelectionViewModel.Model
     ): Boolean {
         TODO("Not yet implemented")
     }
 
     override fun areContentsTheSame(
-        oldItem: TripSelectionViewModel.UiModel,
-        newItem: TripSelectionViewModel.UiModel
+        oldItem: TripSelectionViewModel.Model,
+        newItem: TripSelectionViewModel.Model
     ): Boolean {
         TODO("Not yet implemented")
     }
 }
 
 private class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    fun bind(item: TripSelectionViewModel.Model?) {
 
+        val segmentsTextView: TextView = itemView.findViewById(R.id.journey_item_segments)
+        segmentsTextView.text = item?.legsSummary
+
+        val durationTextView: TextView = itemView.findViewById(R.id.journey_item_duration)
+        durationTextView.text = item?.duration
+    }
 }

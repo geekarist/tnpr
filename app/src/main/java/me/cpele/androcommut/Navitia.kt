@@ -24,7 +24,15 @@ data class NavitiaJourneysResult(val journeys: List<NavitiaJourney>?)
 
 data class NavitiaJourney(val sections: List<NavitiaSection>?)
 
-data class NavitiaSection(val duration: Int?, val from: NavitiaPlace?, val to: NavitiaPlace?)
+data class NavitiaSection(
+    val duration: Int?,
+    val from: NavitiaPlace?,
+    val to: NavitiaPlace?,
+    val code: String?,
+    val commercial_mode: NavitiaCommercialMode?
+)
+
+data class NavitiaCommercialMode(val id: String?, val name: String?)
 
 data class NavitiaPlacesResult(val places: List<NavitiaPlace>?) // TODO: Make nullable
 
