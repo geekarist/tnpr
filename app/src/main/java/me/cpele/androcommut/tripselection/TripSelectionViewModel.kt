@@ -15,6 +15,9 @@ import me.cpele.afk.exhaust
 import me.cpele.androcommut.BuildConfig
 import me.cpele.androcommut.NavitiaJourneysResult
 import me.cpele.androcommut.NavitiaService
+import me.cpele.androcommut.core.Leg
+import me.cpele.androcommut.core.Place
+import me.cpele.androcommut.core.Trip
 import me.cpele.androcommut.tripselection.TripSelectionViewModel.*
 
 class TripSelectionViewModel(
@@ -56,7 +59,7 @@ class TripSelectionViewModel(
 
         val state = stateLive.value
 
-        val model = state?.copy(models = navitiaOutcome.toModels())
+        val model = state?.copy(trips = navitiaOutcome.toModels())
 
         withContext(Dispatchers.Main) {
             _stateLive.value = model
@@ -73,53 +76,33 @@ class TripSelectionViewModel(
     }
 
     data class State(
-        val models: List<Model>? = null
+        val trips: List<Trip>? = null
     )
 
     sealed class Consequence {
     }
 
-    data class Model(
-        val legs: List<Leg>
-    ) {
-        data class Leg(
-            val duration: String,
-            val origin: Place,
-            val destination: Place,
-            val mode: String,
-            val line: String
-        )
-
-        val legsSummary: CharSequence? by lazy {
-            legs.joinToString(", ") { "${it.mode} ${it.line}" }
-        }
-
-        val duration: Int by lazy {
-            legs.sumBy { it.duration }
-        }
-
-        data class Place(val name: String)
-    }
 }
 
-private fun Outcome<NavitiaJourneysResult>.toModels(): List<Model> =
+private fun Outcome<NavitiaJourneysResult>.toModels(): List<Trip> =
     when (this) {
         is Outcome.Success -> value.toModels()
         is Outcome.Failure -> emptyList()
     }
 
-private fun NavitiaJourneysResult.toModels(): List<Model> =
+private fun NavitiaJourneysResult.toModels(): List<Trip> =
+    // TODO: Transform Navitia model to App domain (check and convert)
     journeys?.map { remoteJourney ->
         val remoteSections = remoteJourney.sections
         val legs = remoteSections?.map { remoteSection ->
             val remoteDuration = remoteSection.duration
             val duration = remoteDuration?.toString()
-                ?: "Unknown duration" // TODO: Extract string resources
+                ?: "Unknown duration" // TODO: Extract string resources (not here)
             val from = remoteSection.from?.name ?: "Unknown origin"
             val to = remoteSection.to?.name ?: "Unknown destination"
             val mode = remoteSection.commercial_mode?.name ?: "Unknown mode"
             val code = remoteSection.code ?: "Unknown line"
-            Model.Leg(duration, Model.Place(from), Model.Place(to), mode, code)
+            Leg(duration, Place(from), Place(to), mode, code)
         }
-        Model(legs ?: emptyList())
+        Trip(legs ?: emptyList())
     } ?: emptyList()

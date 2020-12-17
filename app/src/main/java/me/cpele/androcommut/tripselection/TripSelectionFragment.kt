@@ -5,11 +5,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import me.cpele.afk.ViewModelFactory
 import me.cpele.androcommut.CustomApp
@@ -28,7 +25,7 @@ class TripSelectionFragment : Fragment() {
         }
     }
 
-    private val adapter = Adapter()
+    private val adapter = TripSelectionAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,7 +42,7 @@ class TripSelectionFragment : Fragment() {
 
         viewModel.stateLive.observe(viewLifecycleOwner) { state ->
             Log.d(javaClass.simpleName, "Received: $state")
-            val uiModels = state.models
+            val uiModels = state.trips // TODO: Convert to UI model
             adapter.submitList(uiModels)
         }
 
@@ -62,47 +59,5 @@ class TripSelectionFragment : Fragment() {
             ?: throw IllegalArgumentException("Arguments must not be null")
 
         viewModel.dispatch(intention)
-    }
-}
-
-private class Adapter : ListAdapter<TripSelectionViewModel.Model, ViewHolder>(DiffCallback) {
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val layout = R.layout.journey_item_view
-        val inflater = LayoutInflater.from(parent.context)
-        val view = inflater.inflate(layout, parent, false)
-        return ViewHolder(view)
-    }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position))
-    }
-}
-
-private object DiffCallback : DiffUtil.ItemCallback<TripSelectionViewModel.Model>() {
-
-    override fun areItemsTheSame(
-        oldItem: TripSelectionViewModel.Model,
-        newItem: TripSelectionViewModel.Model
-    ): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun areContentsTheSame(
-        oldItem: TripSelectionViewModel.Model,
-        newItem: TripSelectionViewModel.Model
-    ): Boolean {
-        TODO("Not yet implemented")
-    }
-}
-
-private class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-    fun bind(item: TripSelectionViewModel.Model?) {
-
-        val segmentsTextView: TextView = itemView.findViewById(R.id.journey_item_segments)
-        segmentsTextView.text = item?.legsSummary
-
-        val durationTextView: TextView = itemView.findViewById(R.id.journey_item_duration)
-        durationTextView.text = item?.duration
     }
 }
