@@ -16,6 +16,7 @@ import androidx.lifecycle.LiveData
  *
  * The naming follows [github.com/.../Decompose](https://github.com/arkivanov/Decompose).
  */
+// TODO: Move to afk module
 interface Component<IntentionT, StateT, ConsequenceT> {
     fun dispatch(intention: IntentionT)
     val stateLive: LiveData<StateT>

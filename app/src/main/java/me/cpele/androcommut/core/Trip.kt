@@ -1,5 +1,6 @@
 package me.cpele.androcommut.core
 
+// TODO: Move to a core module that has no dependency
 data class Trip(
     val legs: List<Leg>
 ) {
@@ -11,5 +12,4 @@ data class Trip(
     val duration: Int by lazy {
         legs.sumBy { it.duration.toInt() }
     }
-
 }
