@@ -100,8 +100,8 @@ private fun NavitiaJourneysResult.toModels(): List<Trip> =
                 ?: "Unknown duration" // TODO: Extract string resources (not here)
             val from = remoteSection.from?.name ?: "Unknown origin"
             val to = remoteSection.to?.name ?: "Unknown destination"
-            val mode = remoteSection.commercial_mode?.name ?: "Unknown mode"
-            val code = remoteSection.code ?: "Unknown line"
+            val mode = remoteSection.commercial_mode?.name ?: "?"
+            val code = remoteSection.code ?: "?"
             Leg(duration, Place(from), Place(to), mode, code)
         }
         Trip(legs ?: emptyList())
