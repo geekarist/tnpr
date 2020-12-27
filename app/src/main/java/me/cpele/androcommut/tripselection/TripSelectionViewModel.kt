@@ -101,7 +101,7 @@ private fun NavitiaJourneysResult.toModels(): List<Trip> =
             val from = remoteSection.from?.name ?: "Unknown origin"
             val to = remoteSection.to?.name ?: "Unknown destination"
             val mode = remoteSection.display_informations?.commercial_mode ?: "?"
-            val code = remoteSection.code ?: "?"
+            val code = remoteSection.display_informations?.code ?: "?"
             Leg(duration, Place(from), Place(to), mode, code)
         }
         Trip(legs ?: emptyList())
