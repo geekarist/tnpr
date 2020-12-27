@@ -57,7 +57,7 @@ class TripSelectionViewModel(
             }
         }
 
-        val state = stateLive.value
+        val state = _stateLive.value
 
         val model = state?.copy(trips = navitiaOutcome.toModels())
 
@@ -100,7 +100,7 @@ private fun NavitiaJourneysResult.toModels(): List<Trip> =
                 ?: "Unknown duration" // TODO: Extract string resources (not here)
             val from = remoteSection.from?.name ?: "Unknown origin"
             val to = remoteSection.to?.name ?: "Unknown destination"
-            val mode = remoteSection.commercial_mode?.name ?: "?"
+            val mode = remoteSection.display_informations?.commercial_mode ?: "?"
             val code = remoteSection.code ?: "?"
             Leg(duration, Place(from), Place(to), mode, code)
         }

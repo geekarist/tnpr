@@ -29,10 +29,12 @@ data class NavitiaSection(
     val from: NavitiaPlace?,
     val to: NavitiaPlace?,
     val code: String?,
-    val commercial_mode: NavitiaCommercialMode?
+    val display_informations: NavitiaDisplayInformations?
 )
 
-data class NavitiaCommercialMode(val id: String?, val name: String?)
+data class NavitiaDisplayInformations(
+    val commercial_mode: String?
+)
 
 data class NavitiaPlacesResult(val places: List<NavitiaPlace>?) // TODO: Make nullable
 
