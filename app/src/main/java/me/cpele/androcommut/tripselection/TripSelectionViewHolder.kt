@@ -14,5 +14,11 @@ class TripSelectionViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         val durationTextView: TextView = itemView.findViewById(R.id.journey_item_duration)
         durationTextView.text = item?.duration.toString()
+
+        val fromTextView: TextView = itemView.findViewById(R.id.journey_item_start)
+        fromTextView.text = itemView.context.getString(R.string.trip_from, item?.originName)
+
+        val toTextView: TextView = itemView.findViewById(R.id.journey_item_end)
+        toTextView.text = itemView.context.getString(R.string.trip_to, item?.destinationName)
     }
 }
