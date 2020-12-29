@@ -12,9 +12,7 @@ import me.cpele.afk.Component
 import me.cpele.afk.Event
 import me.cpele.afk.Outcome
 import me.cpele.afk.exhaust
-import me.cpele.androcommut.BuildConfig
-import me.cpele.androcommut.NavitiaJourneysResult
-import me.cpele.androcommut.NavitiaService
+import me.cpele.androcommut.*
 import me.cpele.androcommut.core.Leg
 import me.cpele.androcommut.core.Place
 import me.cpele.androcommut.core.Trip
@@ -94,43 +92,75 @@ private fun Outcome<NavitiaJourneysResult>.toModels(): List<Trip> =
     }
 
 private fun NavitiaJourneysResult.toModels(): List<Trip> =
-    journeys?.map { remoteJourney ->
-        val remoteSections = remoteJourney.sections
-        val legs = remoteSections?.map { remoteSection ->
-            val remoteDuration = remoteSection.duration
-            val duration = remoteDuration?.toString()
-                ?: "Unknown duration"
-            val from = remoteSection.from?.name ?: "Unknown origin"
-            val to = remoteSection.to?.name ?: "Unknown destination"
-            val originPlace = Place(from)
-            val destinationPlace = Place(to)
-            when (remoteSection.type) {
-                "transfer", "waiting" -> {
-                    val mode = remoteSection.mode ?: "?"
-                    Leg.Connection(
-                        duration,
-                        originPlace,
-                        destinationPlace,
-                        mode
-                    )
-                }
-                "street_network", "crow_fly" -> {
-                    val mode = remoteSection.mode ?: "?"
-                    Leg.Access(
-                        duration,
-                        originPlace,
-                        destinationPlace,
-                        mode
-                    )
-                }
-                "public_transport" -> {
-                    val mode = remoteSection.display_informations?.commercial_mode ?: "?"
-                    val code = remoteSection.display_informations?.code ?: "?"
-                    Leg.Ride(duration, originPlace, destinationPlace, mode, code)
-                }
-                else -> throw IllegalStateException("Unknown section type ${remoteSection.type} for $remoteSection")
-            }
-        }
-        Trip(legs ?: emptyList())
-    }.also { Log.d(javaClass.simpleName, "Models: $it") }
+    journeys
+        ?.map { remoteJourney -> trip(remoteJourney) }
+        .also { Log.d(javaClass.simpleName, "Models: $it") }
         ?: emptyList()
+
+private fun trip(remoteJourney: NavitiaJourney): Trip {
+    val remoteSections = remoteJourney.sections
+    val legs = remoteSections?.map { remoteSection -> leg(remoteSection) }
+    return Trip(legs ?: emptyList())
+}
+
+private fun leg(remoteSection: NavitiaSection): Leg {
+    val remoteDuration = remoteSection.duration
+    val duration = remoteDuration?.toString() ?: "Unknown duration"
+    val from = remoteSection.from?.name ?: "Unknown origin"
+    val to = remoteSection.to?.name ?: "Unknown destination"
+    val originPlace = Place(from)
+    val destinationPlace = Place(to)
+    return when (remoteSection.type) {
+        "transfer", "waiting" -> {
+            connection(remoteSection, duration, originPlace, destinationPlace)
+        }
+        "street_network", "crow_fly" -> {
+            access(remoteSection, duration, originPlace, destinationPlace)
+        }
+        "public_transport" -> {
+            ride(remoteSection, duration, originPlace, destinationPlace)
+        }
+        else -> throw IllegalStateException("Unknown section type ${remoteSection.type} for $remoteSection")
+    }
+}
+
+private fun ride(
+    remoteSection: NavitiaSection,
+    duration: String,
+    originPlace: Place,
+    destinationPlace: Place
+): Leg.Ride {
+    val mode = remoteSection.display_informations?.commercial_mode ?: "?"
+    val code = remoteSection.display_informations?.code ?: "?"
+    return Leg.Ride(duration, originPlace, destinationPlace, mode, code)
+}
+
+private fun access(
+    remoteSection: NavitiaSection,
+    duration: String,
+    originPlace: Place,
+    destinationPlace: Place
+): Leg.Access {
+    val mode = remoteSection.mode ?: "?"
+    return Leg.Access(
+        duration,
+        originPlace,
+        destinationPlace,
+        mode
+    )
+}
+
+private fun connection(
+    remoteSection: NavitiaSection,
+    duration: String,
+    originPlace: Place,
+    destinationPlace: Place
+): Leg.Connection {
+    val mode = remoteSection.mode ?: "?"
+    return Leg.Connection(
+        duration,
+        originPlace,
+        destinationPlace,
+        mode
+    )
+}
