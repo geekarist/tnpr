@@ -57,12 +57,13 @@ class TripSelectionViewModel(
             }
         }
 
-        val state = _stateLive.value
+        val models = navitiaOutcome.toModels()
 
-        val model = state?.copy(trips = navitiaOutcome.toModels())
+        val state = _stateLive.value
+        val newState = state?.copy(trips = models)
 
         withContext(Dispatchers.Main) {
-            _stateLive.value = model
+            _stateLive.value = newState
         }
     }
 
@@ -88,21 +89,48 @@ private fun Outcome<NavitiaJourneysResult>.toModels(): List<Trip> =
     when (this) {
         is Outcome.Success -> value.toModels()
         is Outcome.Failure -> emptyList()
+    }.also {
+        Log.d(javaClass.simpleName, "Converted models: $it")
     }
 
 private fun NavitiaJourneysResult.toModels(): List<Trip> =
-    // TODO: Transform Navitia model to App domain (check and convert)
     journeys?.map { remoteJourney ->
         val remoteSections = remoteJourney.sections
         val legs = remoteSections?.map { remoteSection ->
             val remoteDuration = remoteSection.duration
             val duration = remoteDuration?.toString()
-                ?: "Unknown duration" // TODO: Extract string resources (not here)
+                ?: "Unknown duration"
             val from = remoteSection.from?.name ?: "Unknown origin"
             val to = remoteSection.to?.name ?: "Unknown destination"
-            val mode = remoteSection.display_informations?.commercial_mode ?: "?"
-            val code = remoteSection.display_informations?.code ?: "?"
-            Leg(duration, Place(from), Place(to), mode, code)
+            val originPlace = Place(from)
+            val destinationPlace = Place(to)
+            when (remoteSection.type) {
+                "transfer", "waiting" -> {
+                    val mode = remoteSection.mode ?: "?"
+                    Leg.Connection(
+                        duration,
+                        originPlace,
+                        destinationPlace,
+                        mode
+                    )
+                }
+                "street_network", "crow_fly" -> {
+                    val mode = remoteSection.mode ?: "?"
+                    Leg.Access(
+                        duration,
+                        originPlace,
+                        destinationPlace,
+                        mode
+                    )
+                }
+                "public_transport" -> {
+                    val mode = remoteSection.display_informations?.commercial_mode ?: "?"
+                    val code = remoteSection.display_informations?.code ?: "?"
+                    Leg.Ride(duration, originPlace, destinationPlace, mode, code)
+                }
+                else -> throw IllegalStateException("Unknown section type ${remoteSection.type} for $remoteSection")
+            }
         }
         Trip(legs ?: emptyList())
-    } ?: emptyList()
+    }.also { Log.d(javaClass.simpleName, "Models: $it") }
+        ?: emptyList()
