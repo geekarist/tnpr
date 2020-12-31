@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import me.cpele.androcommut.R
 import me.cpele.androcommut.core.Trip
+import kotlin.time.ExperimentalTime
 
 class TripSelectionAdapter : ListAdapter<Trip, TripSelectionViewHolder>(
     TripSelectionDiffCallback
@@ -17,6 +18,7 @@ class TripSelectionAdapter : ListAdapter<Trip, TripSelectionViewHolder>(
         return TripSelectionViewHolder(view)
     }
 
+    @ExperimentalTime
     override fun onBindViewHolder(holder: TripSelectionViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
