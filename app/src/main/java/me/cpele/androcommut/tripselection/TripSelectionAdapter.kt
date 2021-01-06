@@ -7,9 +7,10 @@ import me.cpele.androcommut.R
 import me.cpele.androcommut.core.Trip
 import kotlin.time.ExperimentalTime
 
-class TripSelectionAdapter : ListAdapter<Trip, TripSelectionViewHolder>(
-    TripSelectionDiffCallback
-) {
+class TripSelectionAdapter(private val onItemClickListener: (Trip) -> Unit) :
+    ListAdapter<Trip, TripSelectionViewHolder>(
+        TripSelectionDiffCallback
+    ) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TripSelectionViewHolder {
         val layout = R.layout.journey_item_view
@@ -20,6 +21,6 @@ class TripSelectionAdapter : ListAdapter<Trip, TripSelectionViewHolder>(
 
     @ExperimentalTime
     override fun onBindViewHolder(holder: TripSelectionViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position), onItemClickListener)
     }
 }
