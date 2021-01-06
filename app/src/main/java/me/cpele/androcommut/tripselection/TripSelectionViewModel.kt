@@ -17,21 +17,25 @@ import me.cpele.androcommut.core.Leg
 import me.cpele.androcommut.core.Place
 import me.cpele.androcommut.core.Trip
 import me.cpele.androcommut.tripselection.TripSelectionViewModel.*
+import java.util.*
 
 class TripSelectionViewModel(
-    private val navitiaService: NavitiaService
+    private val navitiaService: NavitiaService,
+    private val tripRepository: TripRepository
 ) : ViewModel(), Component<Intention, State, Consequence> {
 
     private val _stateLive = MutableLiveData(State())
     override val stateLive: LiveData<State>
         get() = _stateLive
 
+    private val _eventLive = MutableLiveData<Event<Consequence>>()
     override val eventLive: LiveData<Event<Consequence>>
-        get() = TODO("Not yet implemented")
+        get() = _eventLive
 
     override fun dispatch(intention: Intention) {
         when (intention) {
             is Intention.Load -> handle(intention)
+            is Intention.Select -> handle(intention)
         }.exhaust()
     }
 
@@ -65,6 +69,18 @@ class TripSelectionViewModel(
         }
     }
 
+    private fun handle(intention: Intention.Select) = viewModelScope.launch {
+        Log.d(javaClass.simpleName, "Selected trip: ${intention.trip}")
+
+        val tripId = UUID.randomUUID().toString()
+
+        withContext(Dispatchers.IO) {
+            tripRepository.put(tripId, intention.trip)
+        }
+
+        _eventLive.value = Event(Consequence.OpenTrip(tripId))
+    }
+
     sealed class Intention {
         data class Load(
             val originId: String,
@@ -72,6 +88,8 @@ class TripSelectionViewModel(
             val destinationId: String,
             val destinationLabel: String
         ) : Intention()
+
+        data class Select(val trip: Trip) : Intention()
     }
 
     data class State(
@@ -79,6 +97,7 @@ class TripSelectionViewModel(
     )
 
     sealed class Consequence {
+        data class OpenTrip(val tripId: String) : Consequence()
     }
 
 }

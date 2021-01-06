@@ -22,7 +22,7 @@ class TripSelectionFragment : Fragment() {
 
     private val viewModel: TripSelectionViewModel by viewModels {
         ViewModelFactory {
-            TripSelectionViewModel(CustomApp.instance.navitiaService)
+            TripSelectionViewModel(CustomApp.instance.navitiaService, TODO())
         }
     }
 
@@ -64,7 +64,7 @@ class TripSelectionFragment : Fragment() {
     }
 
     private fun onTripSelected(trip: Trip) {
-        Log.d(javaClass.simpleName, "Selected trip: $trip")
+        viewModel.dispatch(Intention.Select(trip))
     }
 
     override fun onDestroyView() {
