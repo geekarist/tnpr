@@ -1,5 +1,6 @@
 package me.cpele.androcommut.tripselection
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -20,13 +21,23 @@ class TripSelectionFragment : Fragment() {
         fun newInstance() = TripSelectionFragment()
     }
 
+    private var listener: Listener? = null
+
     private val viewModel: TripSelectionViewModel by viewModels {
         ViewModelFactory {
-            TripSelectionViewModel(CustomApp.instance.navitiaService, TODO())
+            TripSelectionViewModel(CustomApp.instance.navitiaService, CustomApp.instance.tripCache)
         }
     }
 
     private var adapter: TripSelectionAdapter? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        listener = context as? Listener
+            ?: throw IllegalStateException(
+                "${context::class.qualifiedName} has to implement ${Listener::class.qualifiedName}"
+            )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,6 +59,12 @@ class TripSelectionFragment : Fragment() {
             adapter?.submitList(uiModels)
         }
 
+        viewModel.eventLive.observe(viewLifecycleOwner) { event ->
+            event.consume {
+                render(it)
+            }
+        }
+
         val intention = arguments
             ?.let { TripSelectionFragmentArgs.fromBundle(it) }
             ?.let {
@@ -63,6 +80,13 @@ class TripSelectionFragment : Fragment() {
         viewModel.dispatch(intention)
     }
 
+    private fun render(consequence: TripSelectionViewModel.Consequence) {
+        when (consequence) {
+            is TripSelectionViewModel.Consequence.OpenTrip ->
+                listener?.openTrip(this, consequence.tripId)
+        }
+    }
+
     private fun onTripSelected(trip: Trip) {
         viewModel.dispatch(Intention.Select(trip))
     }
@@ -70,5 +94,9 @@ class TripSelectionFragment : Fragment() {
     override fun onDestroyView() {
         adapter = null
         super.onDestroyView()
+    }
+
+    interface Listener {
+        fun openTrip(fragment: Fragment, tripId: String)
     }
 }

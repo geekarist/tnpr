@@ -76,5 +76,9 @@
         android:id="@+id/roadmapFragment"
         android:name="me.cpele.androcommut.roadmap.RoadmapFragment"
         android:label="roadmap_fragment"
-        tools:layout="@layout/roadmap_fragment" />
+        tools:layout="@layout/roadmap_fragment">
+        <argument
+            android:name="tripId"
+            app:argType="string" />
+    </fragment>
 </navigation>

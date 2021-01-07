@@ -12,11 +12,14 @@ import me.cpele.androcommut.autosuggest.AutosuggestFragmentDirections
 import me.cpele.androcommut.autosuggest.AutosuggestTrigger
 import me.cpele.androcommut.origdest.OriginDestinationFragment
 import me.cpele.androcommut.origdest.OriginDestinationFragmentDirections
+import me.cpele.androcommut.tripselection.TripSelectionFragment
+import me.cpele.androcommut.tripselection.TripSelectionFragmentDirections
 
 @FlowPreview
 class MainActivity : AppCompatActivity(),
     OriginDestinationFragment.Listener,
-    AutosuggestFragment.Listener {
+    AutosuggestFragment.Listener,
+    TripSelectionFragment.Listener {
 
     private val viewModel: MainViewModel by viewModels { ViewModelFactory { MainViewModel() } }
 
@@ -57,21 +60,20 @@ class MainActivity : AppCompatActivity(),
             )
         )
 
-    override fun openTrip(
+    override fun openTripSelection(
         fragment: Fragment,
         originId: String,
         originLabel: String,
         destinationId: String,
         destinationLabel: String
-    ) =
-        fragment.findNavController().navigate(
-            OriginDestinationFragmentDirections.actionOriginDestinationToTripSelection(
-                originId,
-                originLabel,
-                destinationId,
-                destinationLabel
-            )
+    ) = fragment.findNavController().navigate(
+        OriginDestinationFragmentDirections.actionOriginDestinationToTripSelection(
+            originId,
+            originLabel,
+            destinationId,
+            destinationLabel
         )
+    )
 
     override fun takeAutosuggestion(
         fragment: Fragment,
@@ -79,4 +81,8 @@ class MainActivity : AppCompatActivity(),
         id: String,
         label: String
     ) = viewModel.dispatch(MainViewModel.Intention.Suggestion(fragment.id, trigger, id, label))
+
+    override fun openTrip(fragment: Fragment, tripId: String) =
+        fragment.findNavController()
+            .navigate(TripSelectionFragmentDirections.actionJourneysFragmentToRoadmapFragment(tripId))
 }

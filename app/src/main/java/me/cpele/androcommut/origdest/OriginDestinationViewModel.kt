@@ -41,7 +41,7 @@ class OriginDestinationViewModel(private val app: Application) : ViewModel(),
                 is Intention.Load -> null to state?.process(intention)
                 is Intention.OriginClicked -> Effect.NavigateToAutosuggest.Origin to state
                 is Intention.DestinationClicked -> Effect.NavigateToAutosuggest.Destination to state
-                is Intention.ActionClicked -> Effect.NavigateToTrip(
+                is Intention.ActionClicked -> Effect.NavigateToTripSelection(
                     originId = state?.originId
                         ?: throw IllegalStateException("State is missing an origin ID: $state"),
                     originLabel = state.originLabel
@@ -104,7 +104,7 @@ class OriginDestinationViewModel(private val app: Application) : ViewModel(),
             object Destination : NavigateToAutosuggest()
         }
 
-        data class NavigateToTrip(
+        data class NavigateToTripSelection(
             val originId: String,
             val originLabel: String,
             val destinationId: String,

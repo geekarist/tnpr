@@ -1,6 +1,7 @@
 package me.cpele.androcommut.tripselection
 
 import android.util.Log
+import android.util.LruCache
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -21,7 +22,7 @@ import java.util.*
 
 class TripSelectionViewModel(
     private val navitiaService: NavitiaService,
-    private val tripRepository: TripRepository
+    private val tripCache: LruCache<String, Trip>
 ) : ViewModel(), Component<Intention, State, Consequence> {
 
     private val _stateLive = MutableLiveData(State())
@@ -72,10 +73,10 @@ class TripSelectionViewModel(
     private fun handle(intention: Intention.Select) = viewModelScope.launch {
         Log.d(javaClass.simpleName, "Selected trip: ${intention.trip}")
 
-        val tripId = UUID.randomUUID().toString()
+        val tripId = UUID.nameUUIDFromBytes(intention.trip.toString().toByteArray()).toString()
 
         withContext(Dispatchers.IO) {
-            tripRepository.put(tripId, intention.trip)
+            tripCache.put(tripId, intention.trip)
         }
 
         _eventLive.value = Event(Consequence.OpenTrip(tripId))
