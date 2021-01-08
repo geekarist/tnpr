@@ -24,7 +24,7 @@ class CustomApp : Application() {
             .build()
             .create(NavitiaService::class.java)
 
-        tripCache = LruCache<String, Trip>(100) // TODO: Set maxSize to 1 MB
+        tripCache = LruCache<String, Trip>(100)
     }
 
     companion object {

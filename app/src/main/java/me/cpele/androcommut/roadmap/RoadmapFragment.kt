@@ -5,7 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import me.cpele.afk.ViewModelFactory
+import me.cpele.androcommut.CustomApp
 import me.cpele.androcommut.R
 
 class RoadmapFragment : Fragment() {
@@ -14,7 +16,13 @@ class RoadmapFragment : Fragment() {
         fun newInstance() = RoadmapFragment()
     }
 
-    private lateinit var viewModel: RoadmapViewModel
+    private val viewModel: RoadmapViewModel by viewModels {
+        ViewModelFactory {
+            RoadmapViewModel(
+                CustomApp.instance.tripCache
+            )
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -25,8 +33,11 @@ class RoadmapFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(RoadmapViewModel::class.java)
-        // TODO: Use the ViewModel
+        val args =
+            arguments?.let { RoadmapFragmentArgs.fromBundle(it) } ?: throw IllegalArgumentException(
+                "Invalid arguments: $arguments"
+            )
+        viewModel.load(args.tripId)
     }
 
 }
