@@ -4,9 +4,12 @@ package me.cpele.androcommut.roadmap
 
 import android.util.Log
 import android.util.LruCache
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
+import me.cpele.afk.Outcome
 import me.cpele.androcommut.core.Trip
 import kotlin.time.ExperimentalTime
 
@@ -16,6 +19,9 @@ class RoadmapViewModel(private val tripCache: LruCache<String, Trip>) : ViewMode
     private val inputFlow = MutableStateFlow<Input>(Input.Default)
 
     private val outputFlow: Flow<Output> = process(inputFlow)
+
+    val state: LiveData<Output.State> =
+        outputFlow.filterIsInstance<Output.State>().asLiveData()
 
     init {
         outputFlow.onEach {
@@ -36,57 +42,43 @@ class RoadmapViewModel(private val tripCache: LruCache<String, Trip>) : ViewMode
     }
 
     fun load(tripId: String) {
-        inputFlow.value = Input.Load(tripId)
+        inputFlow.value = Input.Start(tripId)
     }
 }
 
 private sealed class Input {
     object Default : Input()
-    data class Load(val tripId: String) : Input()
+    data class Start(val tripId: String) : Input()
     data class TripRecalled(val id: String, val trip: Trip?) : Input()
 }
 
-private sealed class Output {
+sealed class Output { // TODO: Make private
     data class RecallTrip(val tripId: String) : Output()
-    data class State(
-        val segments: List<SegmentUiModel> = emptyList(),
-        val error: ErrorUiModel? = null
-    ) : Output()
+    data class State(val tripOutcome: Outcome<Trip>) : Output()
 }
-
-data class SegmentUiModel(val description: CharSequence, val duration: CharSequence)
-
-data class ErrorUiModel(val message: CharSequence)
 
 @ExperimentalTime
 private fun process(inputFlow: Flow<Input>): Flow<Output> {
 
-    // Input
-    val loadFlow = inputFlow.filterIsInstance<Input.Load>()
-    val tripRecalled = inputFlow.filterIsInstance<Input.TripRecalled>()
-
-    // State
-    val stateFlow = tripRecalled.map { recalled ->
-        val trip = recalled.trip
-        val tripId = recalled.id
-        if (trip == null) {
-            Output.State(error = ErrorUiModel("Trip not found: $tripId"))
-        } else {
-            Output.State(
-                segments = listOf(
-                    SegmentUiModel(
-                        trip.legsSummary,
-                        trip.formattedDuration
-                    )
-                )
-            )
-        }
-    }
-
-    // Output
-    val recallTripFlow = loadFlow.map {
+    // Start ⇒ recall trip
+    val startFlow = inputFlow.filterIsInstance<Input.Start>()
+    val recallTripFlow = startFlow.map {
         val tripId = it.tripId
         Output.RecallTrip(tripId)
     }
-    return merge(recallTripFlow, stateFlow)
+
+    // Trip recalled ⇒ change state
+    val tripRecalled = inputFlow.filterIsInstance<Input.TripRecalled>()
+    val changeStateFlow = tripRecalled.map { recalled ->
+        val trip = recalled.trip
+        val tripId = recalled.id
+        val outcome = if (trip == null) {
+            Outcome.Failure(Exception("Trip not found: $tripId"))
+        } else {
+            Outcome.Success(trip)
+        }
+        Output.State(outcome)
+    }
+
+    return merge(recallTripFlow, changeStateFlow)
 }
