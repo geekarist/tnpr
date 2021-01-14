@@ -68,8 +68,8 @@ private fun process(inputFlow: Flow<Input>): Flow<Output> {
     }
 
     // Trip recalled ⇒ change state
-    val tripRecalled = inputFlow.filterIsInstance<Input.TripRecalled>()
-    val changeStateFlow = tripRecalled.map { recalled ->
+    val tripRecalledFlow = inputFlow.filterIsInstance<Input.TripRecalled>()
+    val changeStateFlow = tripRecalledFlow.map { recalled ->
         val trip = recalled.trip
         val tripId = recalled.id
         val outcome = if (trip == null) {
