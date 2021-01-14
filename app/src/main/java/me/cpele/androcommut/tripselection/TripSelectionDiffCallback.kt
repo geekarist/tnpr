@@ -9,13 +9,13 @@ object TripSelectionDiffCallback : DiffUtil.ItemCallback<Trip>() {
         oldItem: Trip,
         newItem: Trip
     ): Boolean {
-        TODO("Not yet implemented")
+        return false
     }
 
     override fun areContentsTheSame(
         oldItem: Trip,
         newItem: Trip
     ): Boolean {
-        TODO("Not yet implemented")
+        return false
     }
 }
