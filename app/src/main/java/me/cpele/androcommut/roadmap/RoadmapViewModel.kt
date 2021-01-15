@@ -58,27 +58,25 @@ sealed class Output { // TODO: Make private
 }
 
 @ExperimentalTime
-private fun process(inputFlow: Flow<Input>): Flow<Output> {
+private fun process(inputFlow: Flow<Input>): Flow<Output> = merge(
 
     // Start ⇒ recall trip
-    val startFlow = inputFlow.filterIsInstance<Input.Start>()
-    val recallTripFlow = startFlow.map {
-        val tripId = it.tripId
-        Output.RecallTrip(tripId)
-    }
+    inputFlow.filterIsInstance<Input.Start>()
+        .map {
+            val tripId = it.tripId
+            Output.RecallTrip(tripId)
+        },
 
     // Trip recalled ⇒ change state
-    val tripRecalledFlow = inputFlow.filterIsInstance<Input.TripRecalled>()
-    val changeStateFlow = tripRecalledFlow.map { recalled ->
-        val trip = recalled.trip
-        val tripId = recalled.id
-        val outcome = if (trip == null) {
-            Outcome.Failure(Exception("Trip not found: $tripId"))
-        } else {
-            Outcome.Success(trip)
+    inputFlow.filterIsInstance<Input.TripRecalled>()
+        .map { recalled ->
+            val trip = recalled.trip
+            val tripId = recalled.id
+            val outcome = if (trip == null) {
+                Outcome.Failure(Exception("Trip not found: $tripId"))
+            } else {
+                Outcome.Success(trip)
+            }
+            Output.State(outcome)
         }
-        Output.State(outcome)
-    }
-
-    return merge(recallTripFlow, changeStateFlow)
-}
+)
