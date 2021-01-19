@@ -1,6 +1,8 @@
 package me.cpele.androcommut.roadmap
 
+import android.content.Context
 import android.os.Bundle
+import android.text.format.DateUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +16,7 @@ import me.cpele.androcommut.CustomApp
 import me.cpele.androcommut.R
 import me.cpele.androcommut.core.Leg
 import me.cpele.androcommut.core.Trip
+import java.util.*
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
@@ -39,7 +42,7 @@ class RoadmapFragment : Fragment() {
         recyclerView.adapter = adapter
         viewModel.state.observe(viewLifecycleOwner) { state ->
             Log.d(javaClass.simpleName, "State: $state")
-            val items = items(state)
+            val items = items(requireContext(), state)
             adapter.submitList(items)
         }
     }
@@ -54,17 +57,39 @@ class RoadmapFragment : Fragment() {
     }
 }
 
-private fun items(state: Output.State?): List<RoadmapAdapter.Item> =
+private fun items(context: Context, state: Output.State?): List<RoadmapAdapter.Item> =
     when (val outcome = state?.tripOutcome) {
-        is Outcome.Success -> items(outcome.value)
+        is Outcome.Success -> items(context, outcome.value)
         is Outcome.Failure -> emptyList()
         null -> emptyList()
     }
 
-fun items(trip: Trip): List<RoadmapAdapter.Item> = trip.legs.map { leg -> item(leg) }
+fun items(context: Context, trip: Trip): List<RoadmapAdapter.Item> =
+    trip.legs.map { leg -> item(context, leg) }
 
-fun item(leg: Leg): RoadmapAdapter.Item =
+fun item(context: Context, leg: Leg): RoadmapAdapter.Item =
     RoadmapAdapter.Item(
-        description = leg.toString(),
+        description = description(context, leg),
         duration = leg.duration
     )
+
+private fun description(context: Context, leg: Leg): String {
+    val startTime: Date = leg.startTime
+    val formattedStartTime = DateUtils.formatDateTime(
+        context,
+        startTime.time,
+        DateUtils.FORMAT_ABBREV_ALL
+    )
+    val mode = leg.mode
+    val start = leg.origin.name
+    val end = leg.destination.name
+    val duration = leg.duration
+    return when (leg) {
+        is Leg.Ride -> {
+            val line = leg.line
+            "At $formattedStartTime, take the $mode $line for $duration at $start on its way to $end"
+        }
+        is Leg.Access, is Leg.Connection ->
+            "Take a $mode at $formattedStartTime for $duration from $start to $end"
+    }
+}

@@ -1,5 +1,7 @@
 package me.cpele.androcommut.core
 
+import java.util.*
+
 /**
  *  A leg can be:
  *  - An access leg (first or last leg eg walking to get to a scheduled stop point)
@@ -10,12 +12,14 @@ package me.cpele.androcommut.core
  */
 sealed class Leg {
 
+    abstract val startTime: Date
     abstract val duration: String
     abstract val origin: Place
     abstract val destination: Place
     abstract val mode: String
 
     data class Ride(
+        override val startTime: Date,
         override val duration: String,
         override val origin: Place,
         override val destination: Place,
@@ -24,6 +28,7 @@ sealed class Leg {
     ) : Leg()
 
     data class Access(
+        override val startTime: Date,
         override val duration: String,
         override val origin: Place,
         override val destination: Place,
@@ -31,6 +36,7 @@ sealed class Leg {
     ) : Leg()
 
     data class Connection(
+        override val startTime: Date,
         override val duration: String,
         override val origin: Place,
         override val destination: Place,

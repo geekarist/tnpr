@@ -22,9 +22,13 @@ interface NavitiaService {
 
 data class NavitiaJourneysResult(val journeys: List<NavitiaJourney>?)
 
+/**
+ * Journey from point to point. See [doc.navitia.io/#journeys](https://doc.navitia.io/#journeys)
+ */
 data class NavitiaJourney(val sections: List<NavitiaSection>?)
 
 data class NavitiaSection(
+    val departure_date_time: String?,
     val duration: Int?,
     val from: NavitiaPlace?,
     val to: NavitiaPlace?,
@@ -38,6 +42,6 @@ data class NavitiaDisplayInformations(
     val code: String?
 )
 
-data class NavitiaPlacesResult(val places: List<NavitiaPlace>?) // TODO: Make nullable
+data class NavitiaPlacesResult(val places: List<NavitiaPlace>?)
 
 data class NavitiaPlace(val id: String?, val name: String?)

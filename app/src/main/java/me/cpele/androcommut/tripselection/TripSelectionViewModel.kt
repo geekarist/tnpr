@@ -18,6 +18,7 @@ import me.cpele.androcommut.core.Leg
 import me.cpele.androcommut.core.Place
 import me.cpele.androcommut.core.Trip
 import me.cpele.androcommut.tripselection.TripSelectionViewModel.*
+import java.text.SimpleDateFormat
 import java.util.*
 
 class TripSelectionViewModel(
@@ -106,7 +107,10 @@ class TripSelectionViewModel(
 private fun Outcome<NavitiaJourneysResult>.toModels(): List<Trip> =
     when (this) {
         is Outcome.Success -> value.toModels()
-        is Outcome.Failure -> emptyList()
+        is Outcome.Failure -> {
+            Log.e(javaClass.simpleName, "Journey request failed", error)
+            emptyList()
+        }
     }.also {
         Log.d(javaClass.simpleName, "Converted models: $it")
     }
@@ -152,8 +156,13 @@ private fun ride(
 ): Leg.Ride {
     val mode = remoteSection.display_informations?.commercial_mode ?: "?"
     val code = remoteSection.display_informations?.code ?: "?"
-    return Leg.Ride(duration, originPlace, destinationPlace, mode, code)
+    val startTime: Date = parse(remoteSection.departure_date_time)
+    return Leg.Ride(startTime, duration, originPlace, destinationPlace, mode, code)
 }
+
+fun parse(dateTimeStr: String?): Date = dateTimeStr?.let {
+    SimpleDateFormat("yyyyMMDD'T'HHMMSS", Locale.US).parse(dateTimeStr)
+} ?: Date()
 
 private fun access(
     remoteSection: NavitiaSection,
@@ -162,7 +171,9 @@ private fun access(
     destinationPlace: Place
 ): Leg.Access {
     val mode = remoteSection.mode ?: "?"
+    val startTime: Date = parse(remoteSection.departure_date_time)
     return Leg.Access(
+        startTime,
         duration,
         originPlace,
         destinationPlace,
@@ -177,7 +188,9 @@ private fun connection(
     destinationPlace: Place
 ): Leg.Connection {
     val mode = remoteSection.mode ?: "?"
+    val startTime: Date = parse(remoteSection.departure_date_time)
     return Leg.Connection(
+        startTime,
         duration,
         originPlace,
         destinationPlace,
