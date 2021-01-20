@@ -129,7 +129,8 @@ private fun trip(remoteJourney: NavitiaJourney): Trip {
 
 private fun leg(remoteSection: NavitiaSection): Leg {
     val remoteDuration = remoteSection.duration
-    val duration = remoteDuration?.toString() ?: "Unknown duration"
+    val duration = remoteDuration
+        ?: throw IllegalStateException("Duration should not be null for $remoteSection")
     val from = remoteSection.from?.name ?: "Unknown origin"
     val to = remoteSection.to?.name ?: "Unknown destination"
     val originPlace = Place(from)
@@ -150,14 +151,14 @@ private fun leg(remoteSection: NavitiaSection): Leg {
 
 private fun ride(
     remoteSection: NavitiaSection,
-    duration: String,
+    durationMs: Long,
     originPlace: Place,
     destinationPlace: Place
 ): Leg.Ride {
     val mode = remoteSection.display_informations?.commercial_mode ?: "?"
     val code = remoteSection.display_informations?.code ?: "?"
     val startTime: Date = parse(remoteSection.departure_date_time)
-    return Leg.Ride(startTime, duration, originPlace, destinationPlace, mode, code)
+    return Leg.Ride(startTime, durationMs, originPlace, destinationPlace, mode, code)
 }
 
 fun parse(dateTimeStr: String?): Date = dateTimeStr?.let {
@@ -166,7 +167,7 @@ fun parse(dateTimeStr: String?): Date = dateTimeStr?.let {
 
 private fun access(
     remoteSection: NavitiaSection,
-    duration: String,
+    durationMs: Long,
     originPlace: Place,
     destinationPlace: Place
 ): Leg.Access {
@@ -174,7 +175,7 @@ private fun access(
     val startTime: Date = parse(remoteSection.departure_date_time)
     return Leg.Access(
         startTime,
-        duration,
+        durationMs,
         originPlace,
         destinationPlace,
         mode
@@ -183,7 +184,7 @@ private fun access(
 
 private fun connection(
     remoteSection: NavitiaSection,
-    duration: String,
+    durationMs: Long,
     originPlace: Place,
     destinationPlace: Place
 ): Leg.Connection {
@@ -191,7 +192,7 @@ private fun connection(
     val startTime: Date = parse(remoteSection.departure_date_time)
     return Leg.Connection(
         startTime,
-        duration,
+        durationMs,
         originPlace,
         destinationPlace,
         mode

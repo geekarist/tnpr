@@ -13,14 +13,14 @@ import java.util.*
 sealed class Leg {
 
     abstract val startTime: Date
-    abstract val duration: String
+    abstract val durationSec: Long
     abstract val origin: Place
     abstract val destination: Place
     abstract val mode: String
 
     data class Ride(
         override val startTime: Date,
-        override val duration: String,
+        override val durationSec: Long,
         override val origin: Place,
         override val destination: Place,
         override val mode: String,
@@ -29,7 +29,7 @@ sealed class Leg {
 
     data class Access(
         override val startTime: Date,
-        override val duration: String,
+        override val durationSec: Long,
         override val origin: Place,
         override val destination: Place,
         override val mode: String
@@ -37,7 +37,7 @@ sealed class Leg {
 
     data class Connection(
         override val startTime: Date,
-        override val duration: String,
+        override val durationSec: Long,
         override val origin: Place,
         override val destination: Place,
         override val mode: String

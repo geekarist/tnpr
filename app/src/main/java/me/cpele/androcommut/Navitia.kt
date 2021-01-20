@@ -29,7 +29,7 @@ data class NavitiaJourney(val sections: List<NavitiaSection>?)
 
 data class NavitiaSection(
     val departure_date_time: String?,
-    val duration: Int?,
+    val duration: Long?,
     val from: NavitiaPlace?,
     val to: NavitiaPlace?,
     val type: String?,

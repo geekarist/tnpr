@@ -57,6 +57,7 @@ class RoadmapFragment : Fragment() {
     }
 }
 
+@ExperimentalTime
 private fun items(context: Context, state: Output.State?): List<RoadmapAdapter.Item> =
     when (val outcome = state?.tripOutcome) {
         is Outcome.Success -> items(context, outcome.value)
@@ -64,13 +65,15 @@ private fun items(context: Context, state: Output.State?): List<RoadmapAdapter.I
         null -> emptyList()
     }
 
+@ExperimentalTime
 fun items(context: Context, trip: Trip): List<RoadmapAdapter.Item> =
     trip.legs.map { leg -> item(context, leg) }
 
+@ExperimentalTime
 fun item(context: Context, leg: Leg): RoadmapAdapter.Item =
     RoadmapAdapter.Item(
         description = description(context, leg),
-        duration = leg.duration
+        duration = DateUtils.formatElapsedTime(leg.durationSec)
     )
 
 private fun description(context: Context, leg: Leg): String {
@@ -78,18 +81,17 @@ private fun description(context: Context, leg: Leg): String {
     val formattedStartTime = DateUtils.formatDateTime(
         context,
         startTime.time,
-        DateUtils.FORMAT_ABBREV_ALL
+        DateUtils.FORMAT_SHOW_TIME
     )
     val mode = leg.mode
     val start = leg.origin.name
     val end = leg.destination.name
-    val duration = leg.duration
     return when (leg) {
         is Leg.Ride -> {
             val line = leg.line
-            "At $formattedStartTime, take the $mode $line for $duration at $start on its way to $end"
+            "At $formattedStartTime, take the $mode $line from $start to $end"
         }
         is Leg.Access, is Leg.Connection ->
-            "Take a $mode at $formattedStartTime for $duration from $start to $end"
+            "At $formattedStartTime, go by $mode from $start to $end"
     }
 }

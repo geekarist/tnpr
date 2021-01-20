@@ -16,7 +16,7 @@ data class Trip(
         legs.filterIsInstance<Leg.Ride>()
             .joinToString(", ") { "${it.mode} ${it.line}" }
 
-    private val durationSec: Int = legs.sumBy { it.duration.toInt() }
+    private val durationSec: Int = legs.sumBy { it.durationSec.toInt() }
 
     @ExperimentalTime
     val formattedDuration: String =
