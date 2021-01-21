@@ -17,7 +17,9 @@ import me.cpele.androcommut.R
 import me.cpele.androcommut.core.Leg
 import me.cpele.androcommut.core.Trip
 import java.util.*
+import kotlin.math.roundToInt
 import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
 
 @ExperimentalTime
 class RoadmapFragment : Fragment() {
@@ -42,7 +44,7 @@ class RoadmapFragment : Fragment() {
         recyclerView.adapter = adapter
         viewModel.state.observe(viewLifecycleOwner) { state ->
             Log.d(javaClass.simpleName, "State: $state")
-            val items = items(requireContext(), state)
+            val items = items(requireContext(), state?.tripOutcome)
             adapter.submitList(items)
         }
     }
@@ -58,9 +60,9 @@ class RoadmapFragment : Fragment() {
 }
 
 @ExperimentalTime
-private fun items(context: Context, state: Output.State?): List<RoadmapAdapter.Item> =
-    when (val outcome = state?.tripOutcome) {
-        is Outcome.Success -> items(context, outcome.value)
+private fun items(context: Context, tripOutcome: Outcome<Trip>?): List<RoadmapAdapter.Item> =
+    when (tripOutcome) {
+        is Outcome.Success -> items(context, tripOutcome.value)
         is Outcome.Failure -> emptyList()
         null -> emptyList()
     }
@@ -73,7 +75,7 @@ fun items(context: Context, trip: Trip): List<RoadmapAdapter.Item> =
 fun item(context: Context, leg: Leg): RoadmapAdapter.Item =
     RoadmapAdapter.Item(
         description = description(context, leg),
-        duration = DateUtils.formatElapsedTime(leg.durationSec)
+        duration = "${leg.durationSec.seconds.inMinutes.roundToInt()} min"
     )
 
 private fun description(context: Context, leg: Leg): String {
