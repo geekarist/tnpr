@@ -9,16 +9,12 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.cpele.afk.Component
-import me.cpele.afk.Event
-import me.cpele.afk.Outcome
-import me.cpele.afk.exhaust
+import me.cpele.afk.*
 import me.cpele.androcommut.*
 import me.cpele.androcommut.core.Leg
 import me.cpele.androcommut.core.Place
 import me.cpele.androcommut.core.Trip
 import me.cpele.androcommut.tripselection.TripSelectionViewModel.*
-import java.text.SimpleDateFormat
 import java.util.*
 
 class TripSelectionViewModel(
@@ -161,9 +157,7 @@ private fun ride(
     return Leg.Ride(startTime, durationMs, originPlace, destinationPlace, mode, code)
 }
 
-fun parse(dateTimeStr: String?): Date = dateTimeStr?.let {
-    SimpleDateFormat("yyyyMMDD'T'HHMMSS", Locale.US).parse(dateTimeStr)
-} ?: Date()
+fun parse(dateTimeStr: String?): Date = parseDateTime(dateTimeStr) ?: Date()
 
 private fun access(
     remoteSection: NavitiaSection,
