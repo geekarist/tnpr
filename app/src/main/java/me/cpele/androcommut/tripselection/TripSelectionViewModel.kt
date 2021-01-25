@@ -182,7 +182,7 @@ private fun connection(
     originPlace: Place,
     destinationPlace: Place
 ): Leg.Connection {
-    val mode = remoteSection.mode ?: "?"
+    val mode = remoteSection.transfer_type ?: "?"
     val startTime: Date = parse(remoteSection.departure_date_time)
     return Leg.Connection(
         startTime,

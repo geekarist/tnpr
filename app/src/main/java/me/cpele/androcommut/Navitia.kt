@@ -34,7 +34,8 @@ data class NavitiaSection(
     val to: NavitiaPlace?,
     val type: String?,
     val mode: String?,
-    val display_informations: NavitiaDisplayInformations?
+    val display_informations: NavitiaDisplayInformations?,
+    val transfer_type: String?
 )
 
 data class NavitiaDisplayInformations(
