@@ -119,11 +119,36 @@ private fun NavitiaJourneysResult.toModels(): List<Trip> =
 
 private fun trip(remoteJourney: NavitiaJourney): Trip {
     val remoteSections = remoteJourney.sections
-    val legs = remoteSections?.map { remoteSection -> leg(remoteSection) }
+    val legs = remoteSections
+        ?.let { withWaitingSectionsPairedToPrevious(it) }
+        ?.also { pairs ->
+            pairs.map { (section, waiting) -> "${section.type}/${waiting?.type}" }
+                .also { strings -> Log.d("TMP", strings.toString()) }
+        }
+        ?.map { (remoteSection, waitingSection) -> leg(remoteSection, waitingSection) }
     return Trip(legs ?: emptyList())
 }
 
-private fun leg(remoteSection: NavitiaSection): Leg {
+fun withWaitingSectionsPairedToPrevious(
+    sections: List<NavitiaSection>
+): List<Pair<NavitiaSection, NavitiaSection?>> =
+    sections.fold(listOf()) { acc, section ->
+        val previousSectionToWaiting = acc.lastOrNull()
+        val newAcc = if (previousSectionToWaiting == null) {
+            acc + (section to null)
+        } else {
+            val isSectionWaiting = section.type == "waiting"
+            if (isSectionWaiting) {
+                val (previousSection, _) = previousSectionToWaiting
+                (acc - previousSectionToWaiting) + (previousSection to section)
+            } else {
+                acc + (section to null)
+            }
+        }
+        newAcc
+    }
+
+private fun leg(remoteSection: NavitiaSection, waitingSection: NavitiaSection?): Leg {
     val remoteDuration = remoteSection.duration
     val duration = remoteDuration
         ?: throw IllegalStateException("Duration should not be null for $remoteSection")
