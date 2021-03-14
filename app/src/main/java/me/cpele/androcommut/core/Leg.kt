@@ -40,6 +40,7 @@ sealed class Leg {
         override val durationSec: Long,
         override val origin: Place,
         override val destination: Place,
-        override val mode: String
+        override val mode: String,
+        val waitTimeAtEnd: Long?
     ) : Leg()
 }

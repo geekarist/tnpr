@@ -157,8 +157,8 @@ private fun leg(remoteSection: NavitiaSection, waitingSection: NavitiaSection?):
     val originPlace = Place(from)
     val destinationPlace = Place(to)
     return when (remoteSection.type) {
-        "transfer", "waiting" -> {
-            connection(remoteSection, duration, originPlace, destinationPlace)
+        "transfer" -> {
+            connection(remoteSection, duration, originPlace, destinationPlace, waitingSection)
         }
         "street_network", "crow_fly" -> {
             access(remoteSection, duration, originPlace, destinationPlace)
@@ -205,7 +205,8 @@ private fun connection(
     remoteSection: NavitiaSection,
     durationMs: Long,
     originPlace: Place,
-    destinationPlace: Place
+    destinationPlace: Place,
+    waitingSection: NavitiaSection?
 ): Leg.Connection {
     val mode = remoteSection.transfer_type ?: "?"
     val startTime: Date = parse(remoteSection.departure_date_time)
@@ -214,6 +215,7 @@ private fun connection(
         durationMs,
         originPlace,
         destinationPlace,
-        mode
+        mode,
+        waitingSection?.duration
     )
 }

@@ -94,6 +94,15 @@ private fun description(context: Context, leg: Leg): String {
             "At $formattedStartTime, take the $mode $line from $start to $end"
         }
         is Leg.Access, is Leg.Connection ->
-            "At $formattedStartTime, go by $mode from $start to $end"
+            "At $formattedStartTime, go by $mode from $start to $end" + waitingTimeDesc(leg)
     }
 }
+
+fun waitingTimeDesc(leg: Leg): String =
+    if (leg is Leg.Connection) {
+        val waitingTimeSec = leg.durationSec
+        val formattedDuration = DateUtils.formatElapsedTime(waitingTimeSec)
+        ", then wait for $formattedDuration"
+    } else {
+        ""
+    }

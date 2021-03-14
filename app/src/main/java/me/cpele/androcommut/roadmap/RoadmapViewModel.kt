@@ -5,8 +5,8 @@ package me.cpele.androcommut.roadmap
 import android.util.Log
 import android.util.LruCache
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
 import me.cpele.afk.Outcome
@@ -20,8 +20,10 @@ class RoadmapViewModel(private val tripCache: LruCache<String, Trip>) : ViewMode
 
     private val outputFlow: Flow<Output> = process(inputFlow)
 
-    val state: LiveData<Output.State> =
-        outputFlow.filterIsInstance<Output.State>().asLiveData()
+    val state: LiveData<State> get() = _state
+    private val _state = MutableLiveData<State>()
+
+    data class State(val tripOutcome: Outcome<Trip>)
 
     init {
         outputFlow.onEach {
@@ -32,7 +34,12 @@ class RoadmapViewModel(private val tripCache: LruCache<String, Trip>) : ViewMode
     private fun processOutput(output: Output) {
         when (output) {
             is Output.RecallTrip -> recallTrip(output.tripId)
+            is Output.ChangeState -> changeState(output.tripOutcome)
         }
+    }
+
+    private fun changeState(tripOutcome: Outcome<Trip>) {
+        _state.value = State(tripOutcome)
     }
 
     private fun recallTrip(tripId: String) {
@@ -52,9 +59,9 @@ private sealed class Input {
     data class TripRecalled(val id: String, val trip: Trip?) : Input()
 }
 
-sealed class Output { // TODO: Make private
+private sealed class Output { // TODO: Make private
     data class RecallTrip(val tripId: String) : Output()
-    data class State(val tripOutcome: Outcome<Trip>) : Output()
+    data class ChangeState(val tripOutcome: Outcome<Trip>) : Output()
 }
 
 @ExperimentalTime
@@ -77,6 +84,6 @@ private fun process(inputFlow: Flow<Input>): Flow<Output> = merge(
             } else {
                 Outcome.Success(trip)
             }
-            Output.State(outcome)
+            Output.ChangeState(outcome)
         }
 )
