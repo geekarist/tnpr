@@ -2,13 +2,13 @@ package me.cpele.androcommut
 
 import android.app.Application
 import android.util.LruCache
-import me.cpele.androcommut.core.Trip
+import me.cpele.androcommut.core.Journey
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class CustomApp : Application() {
 
-    lateinit var tripCache: LruCache<String, Trip>
+    lateinit var journeyCache: LruCache<String, Journey>
         private set
 
     lateinit var navitiaService: NavitiaService
@@ -24,7 +24,7 @@ class CustomApp : Application() {
             .build()
             .create(NavitiaService::class.java)
 
-        tripCache = LruCache<String, Trip>(100)
+        journeyCache = LruCache<String, Journey>(100)
     }
 
     companion object {

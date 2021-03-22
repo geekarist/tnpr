@@ -4,15 +4,15 @@ import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import me.cpele.androcommut.R
-import me.cpele.androcommut.core.Trip
+import me.cpele.androcommut.core.Journey
 import kotlin.time.ExperimentalTime
 
 class TripSelectionViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     @ExperimentalTime
-    fun bind(item: Trip, onItemClickListener: (Trip) -> Unit) {
+    fun bind(item: Journey, onItemClickListener: (Journey) -> Unit) {
 
         val segmentsTextView: TextView = itemView.findViewById(R.id.journey_item_segments)
-        segmentsTextView.text = item.legsSummary
+        segmentsTextView.text = item.sectionsSummary
 
         val durationTextView: TextView = itemView.findViewById(R.id.journey_item_duration)
         durationTextView.text = item.formattedDuration

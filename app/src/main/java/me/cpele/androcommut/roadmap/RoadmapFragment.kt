@@ -14,8 +14,8 @@ import me.cpele.afk.Outcome
 import me.cpele.afk.ViewModelFactory
 import me.cpele.androcommut.CustomApp
 import me.cpele.androcommut.R
-import me.cpele.androcommut.core.Leg
-import me.cpele.androcommut.core.Trip
+import me.cpele.androcommut.core.Journey
+import me.cpele.androcommut.core.Section
 import java.util.*
 import kotlin.math.roundToInt
 import kotlin.time.ExperimentalTime
@@ -27,7 +27,7 @@ class RoadmapFragment : Fragment() {
     private val viewModel: RoadmapViewModel by viewModels {
         ViewModelFactory {
             RoadmapViewModel(
-                CustomApp.instance.tripCache
+                CustomApp.instance.journeyCache
             )
         }
     }
@@ -44,7 +44,7 @@ class RoadmapFragment : Fragment() {
         recyclerView.adapter = adapter
         viewModel.state.observe(viewLifecycleOwner) { state ->
             Log.d(javaClass.simpleName, "State: $state")
-            val items = items(requireContext(), state?.tripOutcome)
+            val items = items(requireContext(), state?.journeyOutcome)
             adapter.submitList(items)
         }
     }
@@ -60,49 +60,47 @@ class RoadmapFragment : Fragment() {
 }
 
 @ExperimentalTime
-private fun items(context: Context, tripOutcome: Outcome<Trip>?): List<RoadmapAdapter.Item> =
-    when (tripOutcome) {
-        is Outcome.Success -> items(context, tripOutcome.value)
+private fun items(context: Context, journeyOutcome: Outcome<Journey>?): List<RoadmapAdapter.Item> =
+    when (journeyOutcome) {
+        is Outcome.Success -> items(context, journeyOutcome.value)
         is Outcome.Failure -> emptyList()
         null -> emptyList()
     }
 
 @ExperimentalTime
-fun items(context: Context, trip: Trip): List<RoadmapAdapter.Item> =
-    trip.legs.map { leg -> item(context, leg) }
+fun items(context: Context, journey: Journey): List<RoadmapAdapter.Item> =
+    journey.sections.map { leg -> item(context, leg) }
 
 @ExperimentalTime
-fun item(context: Context, leg: Leg): RoadmapAdapter.Item =
+fun item(context: Context, section: Section): RoadmapAdapter.Item =
     RoadmapAdapter.Item(
-        description = description(context, leg),
-        duration = "${leg.durationSec.seconds.inMinutes.roundToInt()} min"
+        description = description(context, section),
+        duration = "${section.durationSec.seconds.inMinutes.roundToInt()} min"
     )
 
-private fun description(context: Context, leg: Leg): String {
-    val startTime: Date = leg.startTime
+private fun description(context: Context, section: Section): String {
+    val startTime: Date = section.startTime
     val formattedStartTime = DateUtils.formatDateTime(
         context,
         startTime.time,
         DateUtils.FORMAT_SHOW_TIME
     )
-    val mode = leg.mode
-    val start = leg.origin.name
-    val end = leg.destination.name
-    return when (leg) {
-        is Leg.Ride -> {
-            val line = leg.line
-            "At $formattedStartTime, take the $mode $line from $start to $end"
+    return when (section) {
+        is Section.Move -> {
+            val mode = section.mode
+            val start = section.origin.name
+            val end = section.destination.name
+            when (section) {
+                is Section.Move.PublicTransport -> {
+                    val line = section.line
+                    "At $formattedStartTime, take the $mode $line from $start to $end"
+                }
+                is Section.Move.Access, is Section.Move.Transfer ->
+                    "At $formattedStartTime, go by $mode from $start to $end"
+            }
         }
-        is Leg.Access, is Leg.Connection ->
-            "At $formattedStartTime, go by $mode from $start to $end" + waitingTimeDesc(leg)
+        is Section.Wait -> {
+            "At $formattedStartTime, wait"
+        }
     }
 }
-
-fun waitingTimeDesc(leg: Leg): String =
-    if (leg is Leg.Connection) {
-        val waitingTimeSec = leg.durationSec
-        val formattedDuration = DateUtils.formatElapsedTime(waitingTimeSec)
-        ", then wait for $formattedDuration"
-    } else {
-        ""
-    }

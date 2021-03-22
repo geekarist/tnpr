@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import me.cpele.afk.ViewModelFactory
 import me.cpele.androcommut.CustomApp
 import me.cpele.androcommut.R
-import me.cpele.androcommut.core.Trip
+import me.cpele.androcommut.core.Journey
 import me.cpele.androcommut.tripselection.TripSelectionViewModel.Intention
 
 class TripSelectionFragment : Fragment() {
@@ -25,7 +25,10 @@ class TripSelectionFragment : Fragment() {
 
     private val viewModel: TripSelectionViewModel by viewModels {
         ViewModelFactory {
-            TripSelectionViewModel(CustomApp.instance.navitiaService, CustomApp.instance.tripCache)
+            TripSelectionViewModel(
+                CustomApp.instance.navitiaService,
+                CustomApp.instance.journeyCache
+            )
         }
     }
 
@@ -55,7 +58,7 @@ class TripSelectionFragment : Fragment() {
 
         viewModel.stateLive.observe(viewLifecycleOwner) { state ->
             Log.d(javaClass.simpleName, "Received: $state")
-            val uiModels = state.trips // TODO: Convert to UI model
+            val uiModels = state.journeys // TODO: Convert to UI model
             adapter?.submitList(uiModels)
         }
 
@@ -87,8 +90,8 @@ class TripSelectionFragment : Fragment() {
         }
     }
 
-    private fun onTripSelected(trip: Trip) {
-        viewModel.dispatch(Intention.Select(trip))
+    private fun onTripSelected(journey: Journey) {
+        viewModel.dispatch(Intention.Select(journey))
     }
 
     override fun onDestroyView() {

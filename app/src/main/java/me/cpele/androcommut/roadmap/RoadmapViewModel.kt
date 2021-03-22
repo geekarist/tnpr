@@ -10,11 +10,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
 import me.cpele.afk.Outcome
-import me.cpele.androcommut.core.Trip
+import me.cpele.androcommut.core.Journey
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
-class RoadmapViewModel(private val tripCache: LruCache<String, Trip>) : ViewModel() {
+class RoadmapViewModel(private val journeyCache: LruCache<String, Journey>) : ViewModel() {
 
     private val inputFlow = MutableStateFlow<Input>(Input.Default)
 
@@ -23,7 +23,7 @@ class RoadmapViewModel(private val tripCache: LruCache<String, Trip>) : ViewMode
     val state: LiveData<State> get() = _state
     private val _state = MutableLiveData<State>()
 
-    data class State(val tripOutcome: Outcome<Trip>)
+    data class State(val journeyOutcome: Outcome<Journey>)
 
     init {
         outputFlow.onEach {
@@ -34,16 +34,16 @@ class RoadmapViewModel(private val tripCache: LruCache<String, Trip>) : ViewMode
     private fun processOutput(output: Output) {
         when (output) {
             is Output.RecallTrip -> recallTrip(output.tripId)
-            is Output.ChangeState -> changeState(output.tripOutcome)
+            is Output.ChangeState -> changeState(output.journeyOutcome)
         }
     }
 
-    private fun changeState(tripOutcome: Outcome<Trip>) {
-        _state.value = State(tripOutcome)
+    private fun changeState(journeyOutcome: Outcome<Journey>) {
+        _state.value = State(journeyOutcome)
     }
 
     private fun recallTrip(tripId: String) {
-        val recalled = tripCache.get(tripId)
+        val recalled = journeyCache.get(tripId)
         Log.d(javaClass.simpleName, "Recalled trip: $recalled")
         inputFlow.value = Input.TripRecalled(tripId, recalled)
     }
@@ -56,12 +56,12 @@ class RoadmapViewModel(private val tripCache: LruCache<String, Trip>) : ViewMode
 private sealed class Input {
     object Default : Input()
     data class Start(val tripId: String) : Input()
-    data class TripRecalled(val id: String, val trip: Trip?) : Input()
+    data class TripRecalled(val id: String, val journey: Journey?) : Input()
 }
 
 private sealed class Output { // TODO: Make private
     data class RecallTrip(val tripId: String) : Output()
-    data class ChangeState(val tripOutcome: Outcome<Trip>) : Output()
+    data class ChangeState(val journeyOutcome: Outcome<Journey>) : Output()
 }
 
 @ExperimentalTime
@@ -77,7 +77,7 @@ private fun process(inputFlow: Flow<Input>): Flow<Output> = merge(
     // Trip recalled ⇒ change state
     inputFlow.filterIsInstance<Input.TripRecalled>()
         .map { recalled ->
-            val trip = recalled.trip
+            val trip = recalled.journey
             val tripId = recalled.id
             val outcome = if (trip == null) {
                 Outcome.Failure(Exception("Trip not found: $tripId"))

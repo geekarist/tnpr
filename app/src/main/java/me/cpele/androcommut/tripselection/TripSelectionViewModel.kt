@@ -11,15 +11,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.cpele.afk.*
 import me.cpele.androcommut.*
-import me.cpele.androcommut.core.Leg
+import me.cpele.androcommut.core.Journey
 import me.cpele.androcommut.core.Place
-import me.cpele.androcommut.core.Trip
+import me.cpele.androcommut.core.Section
 import me.cpele.androcommut.tripselection.TripSelectionViewModel.*
 import java.util.*
 
 class TripSelectionViewModel(
     private val navitiaService: NavitiaService,
-    private val tripCache: LruCache<String, Trip>
+    private val journeyCache: LruCache<String, Journey>
 ) : ViewModel(), Component<Intention, State, Consequence> {
 
     private val _stateLive = MutableLiveData(State())
@@ -60,7 +60,7 @@ class TripSelectionViewModel(
         val models = navitiaOutcome.toModels()
 
         val state = _stateLive.value
-        val newState = state?.copy(trips = models)
+        val newState = state?.copy(journeys = models)
 
         withContext(Dispatchers.Main) {
             _stateLive.value = newState
@@ -68,12 +68,12 @@ class TripSelectionViewModel(
     }
 
     private fun handle(intention: Intention.Select) = viewModelScope.launch {
-        Log.d(javaClass.simpleName, "Selected trip: ${intention.trip}")
+        Log.d(javaClass.simpleName, "Selected trip: ${intention.journey}")
 
-        val tripId = UUID.nameUUIDFromBytes(intention.trip.toString().toByteArray()).toString()
+        val tripId = UUID.nameUUIDFromBytes(intention.journey.toString().toByteArray()).toString()
 
         withContext(Dispatchers.IO) {
-            tripCache.put(tripId, intention.trip)
+            journeyCache.put(tripId, intention.journey)
         }
 
         _eventLive.value = Event(Consequence.OpenTrip(tripId))
@@ -87,11 +87,11 @@ class TripSelectionViewModel(
             val destinationLabel: String
         ) : Intention()
 
-        data class Select(val trip: Trip) : Intention()
+        data class Select(val journey: Journey) : Intention()
     }
 
     data class State(
-        val trips: List<Trip>? = null
+        val journeys: List<Journey>? = null
     )
 
     sealed class Consequence {
@@ -100,7 +100,7 @@ class TripSelectionViewModel(
 
 }
 
-private fun Outcome<NavitiaJourneysResult>.toModels(): List<Trip> =
+private fun Outcome<NavitiaJourneysResult>.toModels(): List<Journey> =
     when (this) {
         is Outcome.Success -> value.toModels()
         is Outcome.Failure -> {
@@ -111,44 +111,20 @@ private fun Outcome<NavitiaJourneysResult>.toModels(): List<Trip> =
         Log.d(javaClass.simpleName, "Converted models: $it")
     }
 
-private fun NavitiaJourneysResult.toModels(): List<Trip> =
+private fun NavitiaJourneysResult.toModels(): List<Journey> =
     journeys
-        ?.map { remoteJourney -> trip(remoteJourney) }
+        ?.map { remoteJourney -> journey(remoteJourney) }
         .also { Log.d(javaClass.simpleName, "Models: $it") }
         ?: emptyList()
 
-private fun trip(remoteJourney: NavitiaJourney): Trip {
+private fun journey(remoteJourney: NavitiaJourney): Journey {
     val remoteSections = remoteJourney.sections
-    val legs = remoteSections
-        ?.let { withWaitingSectionsPairedToPrevious(it) }
-        ?.also { pairs ->
-            pairs.map { (section, waiting) -> "${section.type}/${waiting?.type}" }
-                .also { strings -> Log.d("TMP", strings.toString()) }
-        }
-        ?.map { (remoteSection, waitingSection) -> leg(remoteSection, waitingSection) }
-    return Trip(legs ?: emptyList())
+    val sections = remoteSections
+        ?.map { remoteSection -> section(remoteSection) }
+    return Journey(sections ?: emptyList())
 }
 
-fun withWaitingSectionsPairedToPrevious(
-    sections: List<NavitiaSection>
-): List<Pair<NavitiaSection, NavitiaSection?>> =
-    sections.fold(listOf()) { acc, section ->
-        val previousSectionToWaiting = acc.lastOrNull()
-        val newAcc = if (previousSectionToWaiting == null) {
-            acc + (section to null)
-        } else {
-            val isSectionWaiting = section.type == "waiting"
-            if (isSectionWaiting) {
-                val (previousSection, _) = previousSectionToWaiting
-                (acc - previousSectionToWaiting) + (previousSection to section)
-            } else {
-                acc + (section to null)
-            }
-        }
-        newAcc
-    }
-
-private fun leg(remoteSection: NavitiaSection, waitingSection: NavitiaSection?): Leg {
+private fun section(remoteSection: NavitiaSection): Section {
     val remoteDuration = remoteSection.duration
     val duration = remoteDuration
         ?: throw IllegalStateException("Duration should not be null for $remoteSection")
@@ -158,28 +134,43 @@ private fun leg(remoteSection: NavitiaSection, waitingSection: NavitiaSection?):
     val destinationPlace = Place(to)
     return when (remoteSection.type) {
         "transfer" -> {
-            connection(remoteSection, duration, originPlace, destinationPlace, waitingSection)
+            transfer(remoteSection, duration, originPlace, destinationPlace)
+        }
+        "waiting" -> {
+            wait(remoteSection, duration)
         }
         "street_network", "crow_fly" -> {
             access(remoteSection, duration, originPlace, destinationPlace)
         }
         "public_transport" -> {
-            ride(remoteSection, duration, originPlace, destinationPlace)
+            publicTransport(remoteSection, duration, originPlace, destinationPlace)
         }
         else -> throw IllegalStateException("Unknown section type ${remoteSection.type} for $remoteSection")
     }
 }
 
-private fun ride(
+fun wait(remoteSection: NavitiaSection, duration: Long): Section {
+    val startTime: Date = parse(remoteSection.departure_date_time)
+    return Section.Wait(duration, startTime)
+}
+
+private fun publicTransport(
     remoteSection: NavitiaSection,
     durationMs: Long,
     originPlace: Place,
     destinationPlace: Place
-): Leg.Ride {
+): Section.Move.PublicTransport {
     val mode = remoteSection.display_informations?.commercial_mode ?: "?"
     val code = remoteSection.display_informations?.code ?: "?"
     val startTime: Date = parse(remoteSection.departure_date_time)
-    return Leg.Ride(startTime, durationMs, originPlace, destinationPlace, mode, code)
+    return Section.Move.PublicTransport(
+        startTime,
+        durationMs,
+        originPlace,
+        destinationPlace,
+        mode,
+        code
+    )
 }
 
 fun parse(dateTimeStr: String?): Date = parseDateTime(dateTimeStr) ?: Date()
@@ -189,10 +180,10 @@ private fun access(
     durationMs: Long,
     originPlace: Place,
     destinationPlace: Place
-): Leg.Access {
+): Section.Move.Access {
     val mode = remoteSection.mode ?: "?"
     val startTime: Date = parse(remoteSection.departure_date_time)
-    return Leg.Access(
+    return Section.Move.Access(
         startTime,
         durationMs,
         originPlace,
@@ -201,21 +192,19 @@ private fun access(
     )
 }
 
-private fun connection(
+private fun transfer(
     remoteSection: NavitiaSection,
     durationMs: Long,
     originPlace: Place,
-    destinationPlace: Place,
-    waitingSection: NavitiaSection?
-): Leg.Connection {
+    destinationPlace: Place
+): Section.Move.Transfer {
     val mode = remoteSection.transfer_type ?: "?"
     val startTime: Date = parse(remoteSection.departure_date_time)
-    return Leg.Connection(
+    return Section.Move.Transfer(
         startTime,
         durationMs,
         originPlace,
         destinationPlace,
-        mode,
-        waitingSection?.duration
+        mode
     )
 }

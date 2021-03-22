@@ -4,11 +4,11 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import me.cpele.androcommut.R
-import me.cpele.androcommut.core.Trip
+import me.cpele.androcommut.core.Journey
 import kotlin.time.ExperimentalTime
 
-class TripSelectionAdapter(private val onItemClickListener: (Trip) -> Unit) :
-    ListAdapter<Trip, TripSelectionViewHolder>(
+class TripSelectionAdapter(private val onItemClickListener: (Journey) -> Unit) :
+    ListAdapter<Journey, TripSelectionViewHolder>(
         TripSelectionDiffCallback
     ) {
 

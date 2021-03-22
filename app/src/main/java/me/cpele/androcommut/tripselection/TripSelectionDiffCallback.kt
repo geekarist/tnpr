@@ -1,20 +1,20 @@
 package me.cpele.androcommut.tripselection
 
 import androidx.recyclerview.widget.DiffUtil
-import me.cpele.androcommut.core.Trip
+import me.cpele.androcommut.core.Journey
 
-object TripSelectionDiffCallback : DiffUtil.ItemCallback<Trip>() {
+object TripSelectionDiffCallback : DiffUtil.ItemCallback<Journey>() {
 
     override fun areItemsTheSame(
-        oldItem: Trip,
-        newItem: Trip
+        oldItem: Journey,
+        newItem: Journey
     ): Boolean {
         return false
     }
 
     override fun areContentsTheSame(
-        oldItem: Trip,
-        newItem: Trip
+        oldItem: Journey,
+        newItem: Journey
     ): Boolean {
         return false
     }
