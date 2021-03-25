@@ -22,7 +22,7 @@ class TripSelectionViewModel(
     private val journeyCache: LruCache<String, Journey>
 ) : ViewModel(), Component<Intention, State, Consequence> {
 
-    private val _stateLive = MutableLiveData(State())
+    private val _stateLive = MutableLiveData<State>()
     override val stateLive: LiveData<State>
         get() = _stateLive
 
@@ -60,7 +60,7 @@ class TripSelectionViewModel(
         val models = navitiaOutcome.toModels()
 
         val state = _stateLive.value
-        val newState = state?.copy(journeys = models)
+        val newState = state?.copy(journeys = models) ?: State(journeys = models)
 
         withContext(Dispatchers.Main) {
             _stateLive.value = newState

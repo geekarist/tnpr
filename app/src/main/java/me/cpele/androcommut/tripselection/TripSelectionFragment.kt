@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import me.cpele.afk.ViewModelFactory
 import me.cpele.androcommut.CustomApp
 import me.cpele.androcommut.R
@@ -56,10 +57,14 @@ class TripSelectionFragment : Fragment() {
         val recyclerView: RecyclerView = view.findViewById(R.id.trip_selection_recycler)
         recyclerView.adapter = adapter
 
-        viewModel.stateLive.observe(viewLifecycleOwner) { state ->
+        val refreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.trip_selection_swipe_refresh)
+        refreshLayout.isRefreshing = true
+
+        viewModel.stateLive.observe(viewLifecycleOwner) { state: TripSelectionViewModel.State ->
             Log.d(javaClass.simpleName, "Received: $state")
             val uiModels = state.journeys // TODO: Convert to UI model
             adapter?.submitList(uiModels)
+            refreshLayout.isRefreshing = false
         }
 
         viewModel.eventLive.observe(viewLifecycleOwner) { event ->
