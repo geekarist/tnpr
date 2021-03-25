@@ -44,12 +44,9 @@ class TripSelectionViewModel(
                     "destination is: ${intention.destinationId}: ${intention.destinationLabel}"
         )
 
-        val stateBefore = _stateLive.value
-        val newStateBefore = stateBefore?.copy(isRefreshing = true)
-            ?: State(isRefreshing = true)
-        withContext(Dispatchers.Main) {
-            _stateLive.value = newStateBefore
-        }
+        val stateBefore = _stateLive.value ?: State()
+        val newStateBefore = stateBefore.copy(isRefreshing = true)
+        withContext(Dispatchers.Main) { _stateLive.value = newStateBefore }
 
         val navitiaOutcome = withContext(Dispatchers.IO) {
             try {
@@ -66,12 +63,9 @@ class TripSelectionViewModel(
 
         val models = navitiaOutcome.toModels()
 
-        val state = _stateLive.value
-        val newState = state?.copy(journeys = models, isRefreshing = false)
-            ?: State(journeys = models, isRefreshing = false)
-        withContext(Dispatchers.Main) {
-            _stateLive.value = newState
-        }
+        val state = _stateLive.value ?: State()
+        val newState = state.copy(journeys = models, isRefreshing = false)
+        withContext(Dispatchers.Main) { _stateLive.value = newState }
     }
 
     private fun handle(intention: Intention.Select) = viewModelScope.launch {
