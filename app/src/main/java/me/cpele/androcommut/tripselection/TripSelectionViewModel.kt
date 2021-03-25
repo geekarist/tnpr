@@ -22,7 +22,7 @@ class TripSelectionViewModel(
     private val journeyCache: LruCache<String, Journey>
 ) : ViewModel(), Component<Intention, State, Consequence> {
 
-    private val _stateLive = MutableLiveData<State>()
+    private val _stateLive = MutableLiveData(State(isRefreshing = true))
     override val stateLive: LiveData<State>
         get() = _stateLive
 
@@ -44,6 +44,13 @@ class TripSelectionViewModel(
                     "destination is: ${intention.destinationId}: ${intention.destinationLabel}"
         )
 
+        val stateBefore = _stateLive.value
+        val newStateBefore = stateBefore?.copy(isRefreshing = true)
+            ?: State(isRefreshing = true)
+        withContext(Dispatchers.Main) {
+            _stateLive.value = newStateBefore
+        }
+
         val navitiaOutcome = withContext(Dispatchers.IO) {
             try {
                 val response = navitiaService.journeys(
@@ -60,8 +67,8 @@ class TripSelectionViewModel(
         val models = navitiaOutcome.toModels()
 
         val state = _stateLive.value
-        val newState = state?.copy(journeys = models) ?: State(journeys = models)
-
+        val newState = state?.copy(journeys = models, isRefreshing = false)
+            ?: State(journeys = models, isRefreshing = false)
         withContext(Dispatchers.Main) {
             _stateLive.value = newState
         }
@@ -91,7 +98,8 @@ class TripSelectionViewModel(
     }
 
     data class State(
-        val journeys: List<Journey>? = null
+        val journeys: List<Journey>? = null,
+        val isRefreshing: Boolean? = null
     )
 
     sealed class Consequence {

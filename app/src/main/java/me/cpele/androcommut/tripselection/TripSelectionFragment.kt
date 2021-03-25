@@ -2,7 +2,6 @@ package me.cpele.androcommut.tripselection
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -58,13 +57,14 @@ class TripSelectionFragment : Fragment() {
         recyclerView.adapter = adapter
 
         val refreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.trip_selection_swipe_refresh)
-        refreshLayout.isRefreshing = true
 
         viewModel.stateLive.observe(viewLifecycleOwner) { state: TripSelectionViewModel.State ->
-            Log.d(javaClass.simpleName, "Received: $state")
-            val uiModels = state.journeys // TODO: Convert to UI model
-            adapter?.submitList(uiModels)
-            refreshLayout.isRefreshing = false
+            state.journeys?.let { journeys ->
+                adapter?.submitList(journeys)
+            }
+            state.isRefreshing?.let {
+                refreshLayout.isRefreshing = state.isRefreshing
+            }
         }
 
         viewModel.eventLive.observe(viewLifecycleOwner) { event ->
@@ -86,6 +86,7 @@ class TripSelectionFragment : Fragment() {
             ?: throw IllegalArgumentException("Arguments must not be null")
 
         viewModel.dispatch(intention)
+        refreshLayout.setOnRefreshListener { viewModel.dispatch(intention) }
     }
 
     private fun render(consequence: TripSelectionViewModel.Consequence) {
