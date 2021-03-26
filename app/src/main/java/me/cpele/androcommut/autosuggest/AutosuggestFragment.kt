@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import androidx.core.content.getSystemService
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -17,10 +19,6 @@ import me.cpele.androcommut.R
 
 @FlowPreview
 class AutosuggestFragment : Fragment() {
-
-    companion object {
-        fun newInstance() = AutosuggestFragment()
-    }
 
     private var listener: Listener? = null
 
@@ -49,14 +47,22 @@ class AutosuggestFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.findViewById<EditText>(R.id.autosuggest_search_edit).addTextChangedListener {
-            viewModel.dispatch(AutosuggestViewModel.Intention.QueryEdited(it))
+        view.findViewById<EditText>(R.id.autosuggest_search_edit).also { editText ->
+            editText.addTextChangedListener {
+                viewModel.dispatch(AutosuggestViewModel.Intention.QueryEdited(it))
+            }
+            editText.isFocusableInTouchMode = true
+            editText.requestFocus()
+            context?.getSystemService<InputMethodManager>()
+                ?.showSoftInput(editText, 0)
         }
 
         val args = arguments?.let { AutosuggestFragmentArgs.fromBundle(it) }
             ?: throw IllegalStateException("Fragment args incorrect: $arguments")
 
         val adapter = AutosuggestAdapter { uiModel ->
+            context?.getSystemService<InputMethodManager>()
+                ?.hideSoftInputFromWindow(view.windowToken, 0)
             listener?.takeAutosuggestion(
                 this,
                 args.trigger,
