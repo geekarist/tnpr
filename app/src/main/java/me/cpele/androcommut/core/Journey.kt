@@ -10,13 +10,25 @@ data class Journey(
 ) {
 
     val originName: CharSequence =
-        sections.filterIsInstance<Section.Move.PublicTransport>().first().origin.name
+        sections.filterIsInstance<Section.Move.PublicTransport>().firstOrNull()?.origin?.name
+            ?: sections.filterIsInstance<Section.Move>().firstOrNull()?.origin?.name
+            ?: throw IllegalStateException("Unknown origin")
+
     val destinationName: CharSequence =
-        sections.filterIsInstance<Section.Move.PublicTransport>().last().destination.name
+        sections.filterIsInstance<Section.Move.PublicTransport>().lastOrNull()?.destination?.name
+            ?: sections.filterIsInstance<Section.Move>().lastOrNull()?.destination?.name
+            ?: throw IllegalStateException("Unknown destination")
 
     val sectionsSummary: CharSequence =
-        sections.filterIsInstance<Section.Move.PublicTransport>()
-            .joinToString(", ") { "${it.mode} ${it.line}" }
+        sections.filterIsInstance<Section.Move>()
+            .let {
+                if (it.size > 1) {
+                    it.filterIsInstance<Section.Move.PublicTransport>()
+                } else {
+                    it
+                }
+            }
+            .joinToString(", ") { it.summary }
 
     private val durationSec: Int = sections.sumBy { it.durationSec.toInt() }
 

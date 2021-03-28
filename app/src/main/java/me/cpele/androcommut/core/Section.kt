@@ -11,6 +11,7 @@ sealed class Section {
         abstract val origin: Place
         abstract val destination: Place
         abstract val mode: String
+        open val summary: CharSequence get() = mode.capitalize(Locale.getDefault())
 
         data class PublicTransport(
             override val startTime: Date,
@@ -18,7 +19,8 @@ sealed class Section {
             override val origin: Place,
             override val destination: Place,
             override val mode: String,
-            val line: String
+            val line: String,
+            override val summary: CharSequence = "$mode $line"
         ) : Move()
 
         data class Access(
