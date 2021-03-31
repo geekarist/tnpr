@@ -100,9 +100,9 @@ class OriginDestinationFragment : Fragment() {
         event.consume { effect ->
             when (effect) {
                 is Effect.NavigateToAutosuggest.Origin ->
-                    listener?.openAutosuggestOrigin(this)
+                    listener?.openAutosuggestOrigin(this, effect.id, effect.label)
                 is Effect.NavigateToAutosuggest.Destination ->
-                    listener?.openAutosuggestDestination(this)
+                    listener?.openAutosuggestDestination(this, effect.id, effect.label)
                 is Effect.NavigateToTripSelection ->
                     listener?.openTripSelection(
                         this,
@@ -122,9 +122,9 @@ class OriginDestinationFragment : Fragment() {
 
     interface Listener {
 
-        fun openAutosuggestOrigin(fragment: Fragment)
+        fun openAutosuggestOrigin(fragment: Fragment, id: String?, label: String?)
 
-        fun openAutosuggestDestination(fragment: Fragment)
+        fun openAutosuggestDestination(fragment: Fragment, id: String?, label: String?)
 
         fun openTripSelection(
             fragment: Fragment,

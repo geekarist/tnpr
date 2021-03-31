@@ -57,6 +57,7 @@ class AutosuggestFragment : Fragment() {
             editText.setText(args.query)
             editText.isFocusableInTouchMode = true
             editText.requestFocus()
+            editText.setSelection(0)
             context?.getSystemService<InputMethodManager>()
                 ?.showSoftInput(editText, 0)
         }
