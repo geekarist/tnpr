@@ -49,14 +49,16 @@ class MainActivity : AppCompatActivity(),
     override fun openAutosuggestOrigin(fragment: Fragment) =
         fragment.findNavController().navigate(
             OriginDestinationFragmentDirections.actionOriginDestinationToAutosuggest(
-                AutosuggestTrigger.ORIGIN
+                AutosuggestTrigger.ORIGIN,
+                "21 coeurs monti"
             )
         )
 
     override fun openAutosuggestDestination(fragment: Fragment) =
         fragment.findNavController().navigate(
             OriginDestinationFragmentDirections.actionOriginDestinationToAutosuggest(
-                AutosuggestTrigger.DESTINATION
+                AutosuggestTrigger.DESTINATION,
+                "132 camelinat malak"
             )
         )
 

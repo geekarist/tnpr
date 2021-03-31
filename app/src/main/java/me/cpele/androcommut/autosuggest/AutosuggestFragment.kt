@@ -47,18 +47,19 @@ class AutosuggestFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val args = arguments?.let { AutosuggestFragmentArgs.fromBundle(it) }
+            ?: throw IllegalStateException("Fragment args incorrect: $arguments")
+
         view.findViewById<EditText>(R.id.autosuggest_search_edit).also { editText ->
             editText.addTextChangedListener {
                 viewModel.dispatch(AutosuggestViewModel.Intention.QueryEdited(it))
             }
+            editText.setText(args.query)
             editText.isFocusableInTouchMode = true
             editText.requestFocus()
             context?.getSystemService<InputMethodManager>()
                 ?.showSoftInput(editText, 0)
         }
-
-        val args = arguments?.let { AutosuggestFragmentArgs.fromBundle(it) }
-            ?: throw IllegalStateException("Fragment args incorrect: $arguments")
 
         val adapter = AutosuggestAdapter { uiModel ->
             context?.getSystemService<InputMethodManager>()
