@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.ImageButton
 import androidx.core.content.getSystemService
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -50,7 +51,8 @@ class AutosuggestFragment : Fragment() {
         val args = arguments?.let { AutosuggestFragmentArgs.fromBundle(it) }
             ?: throw IllegalStateException("Fragment args incorrect: $arguments")
 
-        view.findViewById<EditText>(R.id.autosuggest_search_edit).also { editText ->
+        val queryEdit = view.findViewById<EditText>(R.id.autosuggest_search_edit)
+        queryEdit.also { editText ->
             editText.addTextChangedListener {
                 viewModel.dispatch(AutosuggestViewModel.Intention.QueryEdited(it))
             }
@@ -60,6 +62,10 @@ class AutosuggestFragment : Fragment() {
             editText.setSelection(0)
             context?.getSystemService<InputMethodManager>()
                 ?.showSoftInput(editText, 0)
+        }
+
+        view.findViewById<ImageButton>(R.id.autosuggest_clear_query).also { clearButton ->
+            clearButton.setOnClickListener { queryEdit.setText("") }
         }
 
         val adapter = AutosuggestAdapter { uiModel ->
