@@ -22,7 +22,7 @@ class AutosuggestViewModel(
     private val application: Application
 ) : ViewModel(), Component<Intention, State, Effect> {
 
-    private val _stateLive = MutableLiveData<State>().apply { value = State(emptyList()) }
+    private val _stateLive = MutableLiveData<State>().apply { value = State(emptyList(), false) }
     override val stateLive: LiveData<State>
         get() = _stateLive
 
@@ -73,7 +73,12 @@ class AutosuggestViewModel(
 
     override fun dispatch(intention: Intention) {
         when (intention) {
-            is Intention.QueryEdited -> queryFlow.value = intention.text.toString()
+            is Intention.QueryEdited -> {
+                val query = intention.text
+                queryFlow.value = query?.toString()
+                val isQueryClearable = query != null && query.isNotBlank()
+                _stateLive.value = _stateLive.value?.copy(isQueryClearable = isQueryClearable)
+            }
         }
     }
 
@@ -81,7 +86,7 @@ class AutosuggestViewModel(
         data class QueryEdited(val text: CharSequence?) : Intention()
     }
 
-    data class State(val places: List<PlaceUiModel>)
+    data class State(val places: List<PlaceUiModel>, val isQueryClearable: Boolean)
 
     sealed class Effect
 }

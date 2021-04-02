@@ -52,21 +52,19 @@ class AutosuggestFragment : Fragment() {
             ?: throw IllegalStateException("Fragment args incorrect: $arguments")
 
         val queryEdit = view.findViewById<EditText>(R.id.autosuggest_search_edit)
-        queryEdit.also { editText ->
-            editText.addTextChangedListener {
+        queryEdit.apply {
+            addTextChangedListener {
                 viewModel.dispatch(AutosuggestViewModel.Intention.QueryEdited(it))
             }
-            editText.setText(args.query)
-            editText.isFocusableInTouchMode = true
-            editText.requestFocus()
-            editText.setSelection(0)
-            context?.getSystemService<InputMethodManager>()
-                ?.showSoftInput(editText, 0)
+            setText(args.query)
+            isFocusableInTouchMode = true
+            requestFocus()
+            setSelection(0)
+            context?.getSystemService<InputMethodManager>()?.showSoftInput(this, 0)
         }
 
-        view.findViewById<ImageButton>(R.id.autosuggest_clear_query).also { clearButton ->
-            clearButton.setOnClickListener { queryEdit.setText("") }
-        }
+        val clearButton = view.findViewById<ImageButton>(R.id.autosuggest_clear_query)
+        clearButton.setOnClickListener { queryEdit.setText("") }
 
         val adapter = AutosuggestAdapter { uiModel ->
             context?.getSystemService<InputMethodManager>()
@@ -83,6 +81,9 @@ class AutosuggestFragment : Fragment() {
 
         viewModel.stateLive.observe(viewLifecycleOwner) { state ->
             adapter.submitList(state?.places)
+            clearButton.visibility =
+                if (state?.isQueryClearable == true) View.VISIBLE
+                else View.GONE
         }
     }
 
