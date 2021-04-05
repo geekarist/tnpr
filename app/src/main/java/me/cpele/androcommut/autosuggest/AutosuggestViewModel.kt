@@ -22,7 +22,13 @@ class AutosuggestViewModel(
     private val application: Application
 ) : ViewModel(), Component<Intention, State, Effect> {
 
-    private val _stateLive = MutableLiveData<State>().apply { value = State(emptyList(), false) }
+    private val _stateLive = MutableLiveData<State>().apply {
+        value = State(
+            places = emptyList(),
+            isQueryClearable = false,
+            isRefreshing = false
+        )
+    }
     override val stateLive: LiveData<State>
         get() = _stateLive
 
@@ -33,15 +39,21 @@ class AutosuggestViewModel(
 
     init {
         queryFlow.debounce(1000)
-            .flowOn(Dispatchers.Default)
             .filterNotNull()
+            .flowOn(Dispatchers.Default)
+            .onEach {
+                _stateLive.value = _stateLive.value?.copy(isRefreshing = true)
+            }
+            .flowOn(Dispatchers.Main)
             .map { query -> fetchPlaces(query) }
             .flowOn(Dispatchers.IO)
             .map { result -> result.toUiModels() }
             .flowOn(Dispatchers.Default)
             .onEach { placeUiModels ->
-                val currentState = stateLive.value
-                val newState = currentState?.copy(places = placeUiModels)
+                val newState = stateLive.value?.copy(
+                    places = placeUiModels,
+                    isRefreshing = false
+                )
                 _stateLive.value = newState
             }
             .flowOn(Dispatchers.Main)
@@ -86,7 +98,11 @@ class AutosuggestViewModel(
         data class QueryEdited(val text: CharSequence?) : Intention()
     }
 
-    data class State(val places: List<PlaceUiModel>, val isQueryClearable: Boolean)
+    data class State(
+        val places: List<PlaceUiModel>,
+        val isQueryClearable: Boolean,
+        val isRefreshing: Boolean
+    )
 
     sealed class Effect
 }
