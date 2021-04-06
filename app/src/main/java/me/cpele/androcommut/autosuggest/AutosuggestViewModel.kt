@@ -39,8 +39,22 @@ class AutosuggestViewModel(
 
     init {
         queryFlow
+            .onEach { query ->
+                if (query.isNullOrBlank()) {
+                    _stateLive.value = _stateLive.value?.copy(
+                        places = emptyList(),
+                        isQueryClearable = false
+                    )
+                }
+            }
+            .flowOn(Dispatchers.Main)
+            .filterNot { it.isNullOrBlank() }
+            .flowOn(Dispatchers.Default)
             .onEach {
-                _stateLive.value = _stateLive.value?.copy(isRefreshing = true)
+                _stateLive.value = _stateLive.value?.copy(
+                    isRefreshing = true,
+                    isQueryClearable = false
+                )
             }
             .flowOn(Dispatchers.Main)
             .debounce(1000)
@@ -53,7 +67,8 @@ class AutosuggestViewModel(
             .onEach { placeUiModels ->
                 val newState = stateLive.value?.copy(
                     places = placeUiModels,
-                    isRefreshing = false
+                    isRefreshing = false,
+                    isQueryClearable = true
                 )
                 _stateLive.value = newState
             }
@@ -89,8 +104,6 @@ class AutosuggestViewModel(
             is Intention.QueryEdited -> {
                 val query = intention.text
                 queryFlow.value = query?.toString()
-                val isQueryClearable = query != null && query.isNotBlank()
-                _stateLive.value = _stateLive.value?.copy(isQueryClearable = isQueryClearable)
             }
         }
     }
