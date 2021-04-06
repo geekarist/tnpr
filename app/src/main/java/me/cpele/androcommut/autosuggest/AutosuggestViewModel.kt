@@ -38,13 +38,14 @@ class AutosuggestViewModel(
     private val queryFlow = MutableStateFlow<String?>(null)
 
     init {
-        queryFlow.debounce(1000)
-            .filterNotNull()
-            .flowOn(Dispatchers.Default)
+        queryFlow
             .onEach {
                 _stateLive.value = _stateLive.value?.copy(isRefreshing = true)
             }
             .flowOn(Dispatchers.Main)
+            .debounce(1000)
+            .filterNotNull()
+            .flowOn(Dispatchers.Default)
             .map { query -> fetchPlaces(query) }
             .flowOn(Dispatchers.IO)
             .map { result -> result.toUiModels() }

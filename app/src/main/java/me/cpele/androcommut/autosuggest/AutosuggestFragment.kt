@@ -13,6 +13,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import kotlinx.coroutines.FlowPreview
 import me.cpele.afk.ViewModelFactory
 import me.cpele.androcommut.CustomApp
@@ -79,11 +80,15 @@ class AutosuggestFragment : Fragment() {
         val recycler = view.findViewById<RecyclerView>(R.id.autosuggest_results_recycler)
         recycler.adapter = adapter
 
+        val refreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.autosuggest_refresh)
+        refreshLayout?.setOnRefreshListener { refreshLayout.isRefreshing = false }
+
         viewModel.stateLive.observe(viewLifecycleOwner) { state ->
             adapter.submitList(state?.places)
             clearButton.visibility =
                 if (state?.isQueryClearable == true) View.VISIBLE
                 else View.GONE
+            refreshLayout?.isRefreshing = state?.isRefreshing == true
         }
     }
 
