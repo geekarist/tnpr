@@ -1,6 +1,5 @@
 package me.cpele.androcommut.autosuggest
 
-import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -18,13 +17,12 @@ import me.cpele.androcommut.autosuggest.AutosuggestViewModel.*
 
 @FlowPreview
 class AutosuggestViewModel(
-    private val navitiaService: NavitiaService,
-    private val application: Application
+    private val navitiaService: NavitiaService
 ) : ViewModel(), Component<Intention, State, Effect> {
 
     private val _stateLive = MutableLiveData<State>().apply {
         value = State(
-            places = emptyList(),
+            answer = SuggestAnswerUiModel.Some(emptyList()),
             isQueryClearable = false,
             isRefreshing = false
         )
@@ -42,7 +40,7 @@ class AutosuggestViewModel(
             .onEach { query ->
                 if (query.isNullOrBlank()) {
                     _stateLive.value = _stateLive.value?.copy(
-                        places = emptyList(),
+                        answer = SuggestAnswerUiModel.Some(emptyList()),
                         isQueryClearable = false
                     )
                 }
@@ -66,7 +64,7 @@ class AutosuggestViewModel(
             .flowOn(Dispatchers.Default)
             .onEach { placeUiModels ->
                 val newState = stateLive.value?.copy(
-                    places = placeUiModels,
+                    answer = SuggestAnswerUiModel.Some(placeUiModels),
                     isRefreshing = false,
                     isQueryClearable = true
                 )
@@ -113,7 +111,7 @@ class AutosuggestViewModel(
     }
 
     data class State(
-        val places: List<PlaceUiModel>,
+        val answer: SuggestAnswerUiModel.Some,
         val isQueryClearable: Boolean,
         val isRefreshing: Boolean
     )

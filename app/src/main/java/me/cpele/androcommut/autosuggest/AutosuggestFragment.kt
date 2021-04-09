@@ -27,8 +27,7 @@ class AutosuggestFragment : Fragment() {
     private val viewModel: AutosuggestViewModel by viewModels {
         ViewModelFactory {
             AutosuggestViewModel(
-                CustomApp.instance.navitiaService,
-                CustomApp.instance
+                CustomApp.instance.navitiaService
             )
         }
     }
@@ -84,7 +83,7 @@ class AutosuggestFragment : Fragment() {
         refreshLayout?.setOnRefreshListener { refreshLayout.isRefreshing = false }
 
         viewModel.stateLive.observe(viewLifecycleOwner) { state ->
-            adapter.submitList(state?.places)
+            adapter.submitList(state?.answer?.places)
             clearButton.visibility =
                 if (state?.isQueryClearable == true) View.VISIBLE
                 else View.GONE
