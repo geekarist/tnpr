@@ -60,11 +60,11 @@ class AutosuggestViewModel(
             .flowOn(Dispatchers.Default)
             .map { query -> fetchPlaces(query) }
             .flowOn(Dispatchers.IO)
-            .map { result -> result.toUiModels() }
+            .map { result -> result.toUiModel() }
             .flowOn(Dispatchers.Default)
-            .onEach { placeUiModels ->
+            .onEach { uiModel ->
                 val newState = stateLive.value?.copy(
-                    answer = SuggestAnswerUiModel.Some(placeUiModels),
+                    answer = uiModel,
                     isRefreshing = false,
                     isQueryClearable = true
                 )
@@ -82,7 +82,7 @@ class AutosuggestViewModel(
             Outcome.Failure(t)
         }
 
-    private fun Outcome<NavitiaPlacesResult>.toUiModels(): List<PlaceUiModel> =
+    private fun Outcome<NavitiaPlacesResult>.toUiModel(): SuggestAnswerUiModel =
         when (this) {
             is Outcome.Success ->
                 value.places?.map { navitiaPlace ->
@@ -93,8 +93,16 @@ class AutosuggestViewModel(
                             ?: throw IllegalStateException("Place has no name: $navitiaPlace"),
                         label = navitiaPlace.name
                     )
-                } ?: throw IllegalStateException("Result should have places: $value")
-            is Outcome.Failure -> emptyList()
+                }?.let { placeUiModels ->
+                    if (placeUiModels.isEmpty()) {
+                        SuggestAnswerUiModel.None
+                    } else {
+                        SuggestAnswerUiModel.Some(placeUiModels)
+                    }
+                } ?: "Result should have places: $value".let { msg ->
+                    SuggestAnswerUiModel.Fail(msg, IllegalStateException(msg))
+                }
+            is Outcome.Failure -> SuggestAnswerUiModel.Fail("Error fetching places", error)
         }
 
     override fun dispatch(intention: Intention) {
