@@ -119,7 +119,7 @@ class AutosuggestViewModel(
     }
 
     data class State(
-        val answer: SuggestAnswerUiModel.Some,
+        val answer: SuggestAnswerUiModel,
         val isQueryClearable: Boolean,
         val isRefreshing: Boolean
     )

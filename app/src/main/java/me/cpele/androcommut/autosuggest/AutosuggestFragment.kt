@@ -82,13 +82,33 @@ class AutosuggestFragment : Fragment() {
         val refreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.autosuggest_refresh)
         refreshLayout?.setOnRefreshListener { refreshLayout.isRefreshing = false }
 
-        viewModel.stateLive.observe(viewLifecycleOwner) { state ->
-            adapter.submitList(state?.answer?.places)
-            clearButton.visibility =
-                if (state?.isQueryClearable == true) View.VISIBLE
-                else View.GONE
-            refreshLayout?.isRefreshing = state?.isRefreshing == true
+        viewModel.stateLive.observe(viewLifecycleOwner) { state: AutosuggestViewModel.State ->
+            render(state, adapter, clearButton, refreshLayout)
         }
+    }
+
+    private fun render(
+        state: AutosuggestViewModel.State,
+        adapter: AutosuggestAdapter,
+        clearButton: ImageButton,
+        refreshLayout: SwipeRefreshLayout
+    ) {
+        when (val answer = state.answer) {
+            is SuggestAnswerUiModel.Some -> {
+                adapter.submitList(answer.places)
+            }
+            SuggestAnswerUiModel.None -> {
+                // TODO: Render None
+            }
+            is SuggestAnswerUiModel.Fail -> {
+                // TODO: Render Fail
+            }
+        }
+
+        clearButton.visibility =
+            if (state.isQueryClearable) View.VISIBLE
+            else View.GONE
+        refreshLayout.isRefreshing = state.isRefreshing
     }
 
     override fun onDetach() {
