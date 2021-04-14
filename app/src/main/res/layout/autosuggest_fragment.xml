@@ -70,12 +70,31 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/autosuggest_search_cardview">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/autosuggest_results_recycler"
+        <ViewFlipper
+            android:id="@+id/autosuggest_view_flipper"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/autosuggest_result_view" />
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal"
+                android:text="@string/autosuggest_error" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal"
+                android:text="@string/autosuggest_not_found" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/autosuggest_results_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/autosuggest_result_view" />
+
+        </ViewFlipper>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

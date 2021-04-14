@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ViewFlipper
 import androidx.core.content.getSystemService
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -93,15 +94,17 @@ class AutosuggestFragment : Fragment() {
         clearButton: ImageButton,
         refreshLayout: SwipeRefreshLayout
     ) {
+        val viewFlipper = view?.findViewById<ViewFlipper>(R.id.autosuggest_view_flipper)
         when (val answer = state.answer) {
             is SuggestAnswerUiModel.Some -> {
                 adapter.submitList(answer.places)
+                viewFlipper?.displayedChild = 2
             }
             SuggestAnswerUiModel.None -> {
-                // TODO: Render None
+                viewFlipper?.displayedChild = 1
             }
             is SuggestAnswerUiModel.Fail -> {
-                // TODO: Render Fail
+                viewFlipper?.displayedChild = 0
             }
         }
 

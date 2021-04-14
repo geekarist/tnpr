@@ -12,4 +12,6 @@
     <string name="od_ready_instructions">You\'ve made your choice. Let\'s go!</string>
     <string name="trip_from">From: %1$s</string>
     <string name="trip_to">To: %1$s</string>
+    <string name="autosuggest_not_found">No suggestion found</string>
+    <string name="autosuggest_error">Error searching for suggestions</string>
 </resources>
