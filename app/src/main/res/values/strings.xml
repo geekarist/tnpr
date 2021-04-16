@@ -14,4 +14,5 @@
     <string name="trip_to">To: %1$s</string>
     <string name="autosuggest_not_found">No suggestion found</string>
     <string name="autosuggest_error">Error searching for suggestions</string>
+    <string name="autosuggest_retry">Retry</string>
 </resources>
