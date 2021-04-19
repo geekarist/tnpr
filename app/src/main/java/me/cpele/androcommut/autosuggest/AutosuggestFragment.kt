@@ -83,6 +83,12 @@ class AutosuggestFragment : Fragment() {
         val refreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.autosuggest_refresh)
         refreshLayout?.setOnRefreshListener { refreshLayout.isRefreshing = false }
 
+        view.findViewById<View>(R.id.autosuggest_retry_button)?.let {
+            it.setOnClickListener {
+                viewModel.dispatch(AutosuggestViewModel.Intention.QueryRetry)
+            }
+        }
+
         viewModel.stateLive.observe(viewLifecycleOwner) { state: AutosuggestViewModel.State ->
             render(state, adapter, clearButton, refreshLayout)
         }

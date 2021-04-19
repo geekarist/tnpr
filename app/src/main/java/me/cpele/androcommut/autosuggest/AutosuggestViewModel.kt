@@ -10,10 +10,11 @@ import kotlinx.coroutines.flow.*
 import me.cpele.afk.Component
 import me.cpele.afk.Event
 import me.cpele.afk.Outcome
-import me.cpele.androcommut.BuildConfig
+import me.cpele.afk.exhaust
 import me.cpele.androcommut.NavitiaPlacesResult
 import me.cpele.androcommut.NavitiaService
 import me.cpele.androcommut.autosuggest.AutosuggestViewModel.*
+import java.util.*
 
 @FlowPreview
 class AutosuggestViewModel(
@@ -33,10 +34,13 @@ class AutosuggestViewModel(
     override val eventLive: LiveData<Event<Effect>>
         get() = TODO("Not yet implemented")
 
-    private val queryFlow = MutableStateFlow<String?>(null)
+    private data class Query(val value: String?, val id: UUID = UUID.randomUUID())
+
+    private val queryFlow = MutableStateFlow(Query(null))
 
     init {
         queryFlow
+            .map { it.value }
             .onEach { query ->
                 if (query.isNullOrBlank()) {
                     _stateLive.value = _stateLive.value?.copy(
@@ -109,13 +113,23 @@ class AutosuggestViewModel(
         when (intention) {
             is Intention.QueryEdited -> {
                 val query = intention.text
-                queryFlow.value = query?.toString()
+                queryFlow.value = queryFlow.value.copy(
+                    value = query?.toString()
+                )
             }
-        }
+            is Intention.QueryRetry -> {
+                queryFlow.value = queryFlow.value.copy(
+                    value = queryFlow.value.toString(),
+                    id = UUID.randomUUID()
+                )
+            }
+        }.exhaust()
     }
 
     sealed class Intention {
+
         data class QueryEdited(val text: CharSequence?) : Intention()
+        object QueryRetry : Intention()
     }
 
     data class State(
