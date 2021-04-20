@@ -11,6 +11,7 @@ import me.cpele.afk.Component
 import me.cpele.afk.Event
 import me.cpele.afk.Outcome
 import me.cpele.afk.exhaust
+import me.cpele.androcommut.BuildConfig
 import me.cpele.androcommut.NavitiaPlacesResult
 import me.cpele.androcommut.NavitiaService
 import me.cpele.androcommut.autosuggest.AutosuggestViewModel.*
@@ -79,6 +80,7 @@ class AutosuggestViewModel(
     }
 
     private suspend fun fetchPlaces(query: String): Outcome<NavitiaPlacesResult> =
+//        Outcome.Failure(Exception())
         try {
             val response = navitiaService.places(auth = BuildConfig.NAVITIA_API_KEY, q = query)
             Outcome.Success(response)
@@ -121,6 +123,11 @@ class AutosuggestViewModel(
                 queryFlow.value = queryFlow.value.copy(
                     value = queryFlow.value.toString(),
                     id = UUID.randomUUID()
+                )
+                _stateLive.value = _stateLive.value?.copy(
+                    answer = SuggestAnswerUiModel.Some(
+                        emptyList()
+                    )
                 )
             }
         }.exhaust()
