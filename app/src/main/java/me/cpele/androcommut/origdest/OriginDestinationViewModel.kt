@@ -23,7 +23,8 @@ class OriginDestinationViewModel(private val app: Application) : ViewModel(),
                 originLabel = null,
                 destinationId = null,
                 destinationLabel = null,
-                instructions = app.getString(R.string.od_default_instructions)
+                instructions = app.getString(R.string.od_default_instructions),
+                isActionAllowed = false
             )
         )
     override val stateLive: LiveData<State> get() = _stateLive
@@ -78,6 +79,11 @@ class OriginDestinationViewModel(private val app: Application) : ViewModel(),
             intention.originLabel == null -> app.getString(R.string.od_origin_instructions)
             intention.destinationLabel == null -> app.getString(R.string.od_destination_instructions)
             else -> app.getString(R.string.od_ready_instructions)
+        },
+        isActionAllowed = when {
+            intention.originId == null || intention.originLabel == null -> false
+            intention.destinationId == null || intention.destinationLabel == null -> false
+            else -> true
         }
     )
 
@@ -100,7 +106,8 @@ class OriginDestinationViewModel(private val app: Application) : ViewModel(),
         val originLabel: String?,
         val destinationId: String?,
         val destinationLabel: String?,
-        val instructions: CharSequence
+        val instructions: CharSequence,
+        val isActionAllowed: Boolean
     )
 
     sealed class Effect {

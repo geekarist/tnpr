@@ -91,9 +91,13 @@ class OriginDestinationFragment : Fragment() {
     }
 
     private fun renderState(state: OriginDestinationViewModel.State?) {
-        originButton.text = state?.originLabel
-        destinationButton.text = state?.destinationLabel
-        instructionsText.text = state?.instructions
+        if (state == null) {
+            throw IllegalStateException("State should not be null")
+        }
+        originButton.text = state.originLabel
+        destinationButton.text = state.destinationLabel
+        instructionsText.text = state.instructions
+        actionButton.isEnabled = state.isActionAllowed
     }
 
     private fun renderEvent(event: Event<Effect>) {
