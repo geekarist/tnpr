@@ -55,7 +55,7 @@ class AutosuggestFragment : Fragment() {
         val queryEdit = view.findViewById<EditText>(R.id.autosuggest_search_edit)
         queryEdit.apply {
             addTextChangedListener {
-                viewModel.dispatch(AutosuggestViewModel.Intention.QueryEdited(it))
+                viewModel.dispatch(AutosuggestViewModel.Action.QueryEdited(it))
             }
             setText(args.query)
             isFocusableInTouchMode = true
@@ -85,7 +85,7 @@ class AutosuggestFragment : Fragment() {
 
         view.findViewById<View>(R.id.autosuggest_retry_button)?.let {
             it.setOnClickListener {
-                viewModel.dispatch(AutosuggestViewModel.Intention.QueryRetry)
+                viewModel.dispatch(AutosuggestViewModel.Action.QueryRetry)
             }
         }
 

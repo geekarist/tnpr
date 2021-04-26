@@ -20,7 +20,7 @@ import java.util.*
 @FlowPreview
 class AutosuggestViewModel(
     private val navitiaService: NavitiaService
-) : ViewModel(), Component<Intention, State, Effect> {
+) : ViewModel(), Component<Action, State, Effect> {
 
     private val _stateLive = MutableLiveData<State>().apply {
         value = State(
@@ -111,15 +111,15 @@ class AutosuggestViewModel(
             is Outcome.Failure -> SuggestAnswerUiModel.Fail("Error fetching places", error)
         }
 
-    override fun dispatch(intention: Intention) {
-        when (intention) {
-            is Intention.QueryEdited -> {
-                val query = intention.text
+    override fun dispatch(action: Action) {
+        when (action) {
+            is Action.QueryEdited -> {
+                val query = action.text
                 queryFlow.value = queryFlow.value.copy(
                     value = query?.toString()
                 )
             }
-            is Intention.QueryRetry -> {
+            is Action.QueryRetry -> {
                 queryFlow.value = queryFlow.value.copy(
                     value = queryFlow.value.toString(),
                     id = UUID.randomUUID()
@@ -133,10 +133,10 @@ class AutosuggestViewModel(
         }.exhaust()
     }
 
-    sealed class Intention {
+    sealed class Action {
 
-        data class QueryEdited(val text: CharSequence?) : Intention()
-        object QueryRetry : Intention()
+        data class QueryEdited(val text: CharSequence?) : Action()
+        object QueryRetry : Action()
     }
 
     data class State(

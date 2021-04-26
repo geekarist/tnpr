@@ -13,7 +13,7 @@ import me.cpele.afk.ViewModelFactory
 import me.cpele.androcommut.CustomApp
 import me.cpele.androcommut.R
 import me.cpele.androcommut.core.Journey
-import me.cpele.androcommut.tripselection.TripSelectionViewModel.Intention
+import me.cpele.androcommut.tripselection.TripSelectionViewModel.Action
 
 class TripSelectionFragment : Fragment() {
 
@@ -76,7 +76,7 @@ class TripSelectionFragment : Fragment() {
         val intention = arguments
             ?.let { TripSelectionFragmentArgs.fromBundle(it) }
             ?.let {
-                Intention.Load(
+                Action.Load(
                     it.originId,
                     it.originLabel,
                     it.destinationId,
@@ -97,7 +97,7 @@ class TripSelectionFragment : Fragment() {
     }
 
     private fun onTripSelected(journey: Journey) {
-        viewModel.dispatch(Intention.Select(journey))
+        viewModel.dispatch(Action.Select(journey))
     }
 
     override fun onDestroyView() {

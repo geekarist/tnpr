@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity(),
         trigger: AutosuggestTrigger,
         id: String,
         label: String
-    ) = viewModel.dispatch(MainViewModel.Intention.Suggestion(fragment.id, trigger, id, label))
+    ) = viewModel.dispatch(MainViewModel.Action.Suggestion(fragment.id, trigger, id, label))
 
     override fun openTrip(fragment: Fragment, tripId: String) =
         fragment.findNavController()

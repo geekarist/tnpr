@@ -59,7 +59,7 @@ class OriginDestinationFragment : Fragment() {
         val intention = OriginDestinationFragmentArgs
             .fromBundle(requireArguments())
             .let { args ->
-                OriginDestinationViewModel.Intention.Load(
+                OriginDestinationViewModel.Action.Load(
                     args.originId,
                     args.originLabel,
                     args.destinationId,
@@ -78,15 +78,15 @@ class OriginDestinationFragment : Fragment() {
         viewModel.eventLive.observe(viewLifecycleOwner) { event -> renderEvent(event) }
 
         originButton.setOnClickListener {
-            viewModel.dispatch(OriginDestinationViewModel.Intention.OriginClicked)
+            viewModel.dispatch(OriginDestinationViewModel.Action.OriginClicked)
         }
 
         destinationButton.setOnClickListener {
-            viewModel.dispatch(OriginDestinationViewModel.Intention.DestinationClicked)
+            viewModel.dispatch(OriginDestinationViewModel.Action.DestinationClicked)
         }
 
         actionButton.setOnClickListener {
-            viewModel.dispatch(OriginDestinationViewModel.Intention.ActionClicked)
+            viewModel.dispatch(OriginDestinationViewModel.Action.ActionClicked)
         }
     }
 

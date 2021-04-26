@@ -8,7 +8,7 @@ import me.cpele.afk.Event
 import me.cpele.androcommut.MainViewModel.*
 import me.cpele.androcommut.autosuggest.AutosuggestTrigger
 
-class MainViewModel : ViewModel(), Component<Intention, State, Effect> {
+class MainViewModel : ViewModel(), Component<Action, State, Effect> {
 
     private val _stateLive = MutableLiveData(State())
     override val stateLive: LiveData<State>
@@ -18,26 +18,26 @@ class MainViewModel : ViewModel(), Component<Intention, State, Effect> {
     override val eventLive: LiveData<Event<Effect>>
         get() = _effectLive
 
-    override fun dispatch(intention: Intention) {
+    override fun dispatch(action: Action) {
 
         val state = _stateLive.value
 
-        val effect = when (intention) {
-            is Intention.Suggestion ->
-                when (intention.trigger) {
+        val effect = when (action) {
+            is Action.Suggestion ->
+                when (action.trigger) {
                     AutosuggestTrigger.ORIGIN -> Effect.SuggestionIdentified(
-                        intention.fragmentId,
-                        intention.id,
-                        intention.label,
+                        action.fragmentId,
+                        action.id,
+                        action.label,
                         state?.destinationId,
                         state?.destinationLabel
                     )
                     AutosuggestTrigger.DESTINATION -> Effect.SuggestionIdentified(
-                        intention.fragmentId,
+                        action.fragmentId,
                         state?.originId,
                         state?.originLabel,
-                        intention.id,
-                        intention.label
+                        action.id,
+                        action.label
                     )
                 }
         }
@@ -53,13 +53,13 @@ class MainViewModel : ViewModel(), Component<Intention, State, Effect> {
         _stateLive.value = newState
     }
 
-    sealed class Intention {
+    sealed class Action {
         data class Suggestion(
             val fragmentId: Int,
             val trigger: AutosuggestTrigger,
             val id: String,
             val label: String
-        ) : Intention()
+        ) : Action()
     }
 
     sealed class Effect {

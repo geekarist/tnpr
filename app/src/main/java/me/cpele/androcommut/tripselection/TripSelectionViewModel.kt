@@ -20,7 +20,7 @@ import java.util.*
 class TripSelectionViewModel(
     private val navitiaService: NavitiaService,
     private val journeyCache: LruCache<String, Journey>
-) : ViewModel(), Component<Intention, State, Consequence> {
+) : ViewModel(), Component<Action, State, Consequence> {
 
     private val _stateLive = MutableLiveData(State(isRefreshing = true))
     override val stateLive: LiveData<State>
@@ -30,18 +30,18 @@ class TripSelectionViewModel(
     override val eventLive: LiveData<Event<Consequence>>
         get() = _eventLive
 
-    override fun dispatch(intention: Intention) {
-        when (intention) {
-            is Intention.Load -> handle(intention)
-            is Intention.Select -> handle(intention)
+    override fun dispatch(action: Action) {
+        when (action) {
+            is Action.Load -> handle(action)
+            is Action.Select -> handle(action)
         }.exhaust()
     }
 
-    private fun handle(intention: Intention.Load) = viewModelScope.launch {
+    private fun handle(action: Action.Load) = viewModelScope.launch {
         Log.d(
             javaClass.simpleName,
-            "Origin is ${intention.originId}: ${intention.originLabel}, " +
-                    "destination is: ${intention.destinationId}: ${intention.destinationLabel}"
+            "Origin is ${action.originId}: ${action.originLabel}, " +
+                    "destination is: ${action.destinationId}: ${action.destinationLabel}"
         )
 
         val stateBefore = _stateLive.value ?: State()
@@ -52,8 +52,8 @@ class TripSelectionViewModel(
             try {
                 val response = navitiaService.journeys(
                     BuildConfig.NAVITIA_API_KEY,
-                    intention.originId,
-                    intention.destinationId
+                    action.originId,
+                    action.destinationId
                 )
                 Outcome.Success(response)
             } catch (t: Throwable) {
@@ -68,27 +68,27 @@ class TripSelectionViewModel(
         withContext(Dispatchers.Main) { _stateLive.value = newState }
     }
 
-    private fun handle(intention: Intention.Select) = viewModelScope.launch {
-        Log.d(javaClass.simpleName, "Selected trip: ${intention.journey}")
+    private fun handle(action: Action.Select) = viewModelScope.launch {
+        Log.d(javaClass.simpleName, "Selected trip: ${action.journey}")
 
-        val tripId = UUID.nameUUIDFromBytes(intention.journey.toString().toByteArray()).toString()
+        val tripId = UUID.nameUUIDFromBytes(action.journey.toString().toByteArray()).toString()
 
         withContext(Dispatchers.IO) {
-            journeyCache.put(tripId, intention.journey)
+            journeyCache.put(tripId, action.journey)
         }
 
         _eventLive.value = Event(Consequence.OpenTrip(tripId))
     }
 
-    sealed class Intention {
+    sealed class Action {
         data class Load(
             val originId: String,
             val originLabel: String,
             val destinationId: String,
             val destinationLabel: String
-        ) : Intention()
+        ) : Action()
 
-        data class Select(val journey: Journey) : Intention()
+        data class Select(val journey: Journey) : Action()
     }
 
     data class State(

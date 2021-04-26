@@ -14,7 +14,7 @@ import me.cpele.androcommut.R
 import me.cpele.androcommut.origdest.OriginDestinationViewModel.*
 
 class OriginDestinationViewModel(private val app: Application) : ViewModel(),
-    Component<Intention, State, Effect> {
+    Component<Action, State, Effect> {
 
     private val _stateLive =
         MutableLiveData(
@@ -32,23 +32,23 @@ class OriginDestinationViewModel(private val app: Application) : ViewModel(),
     private val _effectLive = MutableLiveData<Event<Effect>>()
     override val eventLive: LiveData<Event<Effect>> get() = _effectLive
 
-    override fun dispatch(intention: Intention) {
+    override fun dispatch(action: Action) {
 
         viewModelScope.launch {
 
             val state = stateLive.value
 
-            val (effect, newState) = when (intention) {
-                is Intention.Load -> null to state?.process(intention)
-                is Intention.OriginClicked -> Effect.NavigateToAutosuggest.Origin(
+            val (effect, newState) = when (action) {
+                is Action.Load -> null to state?.process(action)
+                is Action.OriginClicked -> Effect.NavigateToAutosuggest.Origin(
                     state?.originId,
                     state?.originLabel
                 ) to state
-                is Intention.DestinationClicked -> Effect.NavigateToAutosuggest.Destination(
+                is Action.DestinationClicked -> Effect.NavigateToAutosuggest.Destination(
                     state?.destinationId,
                     state?.destinationLabel
                 ) to state
-                is Intention.ActionClicked -> Effect.NavigateToTripSelection(
+                is Action.ActionClicked -> Effect.NavigateToTripSelection(
                     originId = state?.originId
                         ?: throw IllegalStateException("State is missing an origin ID: $state"),
                     originLabel = state.originLabel
@@ -68,37 +68,37 @@ class OriginDestinationViewModel(private val app: Application) : ViewModel(),
     }
 
     private fun State.process(
-        intention: Intention.Load
+        action: Action.Load
     ): State = copy(
-        originId = intention.originId ?: originId,
-        originLabel = intention.originLabel ?: originLabel,
-        destinationId = intention.destinationId ?: destinationId,
-        destinationLabel = intention.destinationLabel ?: destinationLabel,
+        originId = action.originId ?: originId,
+        originLabel = action.originLabel ?: originLabel,
+        destinationId = action.destinationId ?: destinationId,
+        destinationLabel = action.destinationLabel ?: destinationLabel,
         instructions = when {
-            intention.originLabel == null && intention.destinationLabel == null -> app.getString(R.string.od_default_instructions)
-            intention.originLabel == null -> app.getString(R.string.od_origin_instructions)
-            intention.destinationLabel == null -> app.getString(R.string.od_destination_instructions)
+            action.originLabel == null && action.destinationLabel == null -> app.getString(R.string.od_default_instructions)
+            action.originLabel == null -> app.getString(R.string.od_origin_instructions)
+            action.destinationLabel == null -> app.getString(R.string.od_destination_instructions)
             else -> app.getString(R.string.od_ready_instructions)
         },
         isActionAllowed = when {
-            intention.originId == null || intention.originLabel == null -> false
-            intention.destinationId == null || intention.destinationLabel == null -> false
+            action.originId == null || action.originLabel == null -> false
+            action.destinationId == null || action.destinationLabel == null -> false
             else -> true
         }
     )
 
-    sealed class Intention {
+    sealed class Action {
 
         data class Load(
             val originId: String?,
             val originLabel: String?,
             val destinationId: String?,
             val destinationLabel: String?
-        ) : Intention()
+        ) : Action()
 
-        object OriginClicked : Intention()
-        object DestinationClicked : Intention()
-        object ActionClicked : Intention()
+        object OriginClicked : Action()
+        object DestinationClicked : Action()
+        object ActionClicked : Action()
     }
 
     data class State(

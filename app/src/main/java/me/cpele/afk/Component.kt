@@ -3,22 +3,22 @@ package me.cpele.afk
 import androidx.lifecycle.LiveData
 
 /**
- * User facing business logic component.
+ * Business logic component.
  *
- * A [Component] processes [IntentionT]s.
+ * A [Component] processes [ActionT]s.
  * It applies some logic to it.
  * It holds and exposes a [StateT], and produces [ConsequenceT]s.
  * The [ConsequenceT]s can be consumed via [Event].
  *
- * @param IntentionT User intention
+ * @param ActionT Action
  * @param StateT Component state
- * @param ConsequenceT Consequence for the user (payload of a consumable [Event]
+ * @param ConsequenceT Consequence for the caller (payload of a consumable [Event]
  *
  * The naming follows [github.com/.../Decompose](https://github.com/arkivanov/Decompose).
  */
 // TODO: Move to afk module
-interface Component<IntentionT, StateT, ConsequenceT> {
-    fun dispatch(intention: IntentionT)
+interface Component<ActionT, StateT, ConsequenceT> {
+    fun dispatch(action: ActionT)
     val stateLive: LiveData<StateT>
     val eventLive: LiveData<Event<ConsequenceT>>
 }
