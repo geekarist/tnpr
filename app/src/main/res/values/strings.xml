@@ -15,4 +15,6 @@
     <string name="autosuggest_not_found">No suggestion found</string>
     <string name="autosuggest_error">Error searching for suggestions</string>
     <string name="autosuggest_retry">Retry</string>
+    <string name="journey_selection_not_found">No journey found</string>
+    <string name="journey_selection_error">Error searching for journeys</string>
 </resources>
