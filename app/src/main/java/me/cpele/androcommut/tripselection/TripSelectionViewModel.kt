@@ -9,11 +9,14 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.cpele.afk.*
-import me.cpele.androcommut.*
+import me.cpele.afk.Component
+import me.cpele.afk.Event
+import me.cpele.afk.Outcome
+import me.cpele.afk.exhaust
+import me.cpele.androcommut.BuildConfig
+import me.cpele.androcommut.NavitiaJourneysResult
+import me.cpele.androcommut.NavitiaService
 import me.cpele.androcommut.core.Journey
-import me.cpele.androcommut.core.Place
-import me.cpele.androcommut.core.Section
 import me.cpele.androcommut.tripselection.TripSelectionViewModel.*
 import java.util.*
 
@@ -48,24 +51,28 @@ class TripSelectionViewModel(
         val newStateBefore = stateBefore.copy(isRefreshing = true)
         withContext(Dispatchers.Main) { _stateLive.value = newStateBefore }
 
-        val navitiaOutcome = withContext(Dispatchers.IO) {
-            try {
-                val response = navitiaService.journeys(
-                    BuildConfig.NAVITIA_API_KEY,
-                    action.originId,
-                    action.destinationId
-                )
-                Outcome.Success(response)
-            } catch (t: Throwable) {
-                Outcome.Failure(t)
-            }
-        }
-
-        val models = navitiaOutcome.toModels()
+        val navitiaOutcome = fetchJourneys(action.originId, action.destinationId)
+        val models = model(navitiaOutcome)
 
         val state = _stateLive.value ?: State()
         val newState = state.copy(journeys = models, isRefreshing = false)
         withContext(Dispatchers.Main) { _stateLive.value = newState }
+    }
+
+    private suspend fun fetchJourneys(
+        originId: String,
+        destinationId: String
+    ): Outcome<NavitiaJourneysResult> = withContext(Dispatchers.IO) {
+        try {
+            val response = navitiaService.journeys(
+                BuildConfig.NAVITIA_API_KEY,
+                originId,
+                destinationId
+            )
+            Outcome.Success(response)
+        } catch (t: Throwable) {
+            Outcome.Failure(t)
+        }
     }
 
     private fun handle(action: Action.Select) = viewModelScope.launch {
@@ -99,114 +106,4 @@ class TripSelectionViewModel(
     sealed class Consequence {
         data class OpenTrip(val tripId: String) : Consequence()
     }
-
-}
-
-private fun Outcome<NavitiaJourneysResult>.toModels(): List<Journey> =
-    when (this) {
-        is Outcome.Success -> value.toModels()
-        is Outcome.Failure -> {
-            Log.e(javaClass.simpleName, "Journey request failed", error)
-            emptyList()
-        }
-    }.also {
-        Log.d(javaClass.simpleName, "Converted models: $it")
-    }
-
-private fun NavitiaJourneysResult.toModels(): List<Journey> =
-    journeys
-        ?.map { remoteJourney -> journey(remoteJourney) }
-        .also { Log.d(javaClass.simpleName, "Models: $it") }
-        ?: emptyList()
-
-private fun journey(remoteJourney: NavitiaJourney): Journey {
-    val remoteSections = remoteJourney.sections
-    val sections = remoteSections
-        ?.map { remoteSection -> section(remoteSection) }
-    return Journey(sections ?: emptyList())
-}
-
-private fun section(remoteSection: NavitiaSection): Section {
-    val remoteDuration = remoteSection.duration
-    val duration = remoteDuration
-        ?: throw IllegalStateException("Duration should not be null for $remoteSection")
-    val from = remoteSection.from?.name ?: "Unknown origin"
-    val to = remoteSection.to?.name ?: "Unknown destination"
-    val originPlace = Place(from)
-    val destinationPlace = Place(to)
-    return when (remoteSection.type) {
-        "transfer" -> {
-            transfer(remoteSection, duration, originPlace, destinationPlace)
-        }
-        "waiting" -> {
-            wait(remoteSection, duration)
-        }
-        "street_network", "crow_fly" -> {
-            access(remoteSection, duration, originPlace, destinationPlace)
-        }
-        "public_transport" -> {
-            publicTransport(remoteSection, duration, originPlace, destinationPlace)
-        }
-        else -> throw IllegalStateException("Unknown section type ${remoteSection.type} for $remoteSection")
-    }
-}
-
-fun wait(remoteSection: NavitiaSection, duration: Long): Section {
-    val startTime: Date = parse(remoteSection.departure_date_time)
-    return Section.Wait(duration, startTime)
-}
-
-private fun publicTransport(
-    remoteSection: NavitiaSection,
-    durationMs: Long,
-    originPlace: Place,
-    destinationPlace: Place
-): Section.Move.PublicTransport {
-    val mode = remoteSection.display_informations?.commercial_mode ?: "?"
-    val code = remoteSection.display_informations?.code ?: "?"
-    val startTime: Date = parse(remoteSection.departure_date_time)
-    return Section.Move.PublicTransport(
-        startTime,
-        durationMs,
-        originPlace,
-        destinationPlace,
-        mode,
-        code
-    )
-}
-
-fun parse(dateTimeStr: String?): Date = parseDateTime(dateTimeStr) ?: Date()
-
-private fun access(
-    remoteSection: NavitiaSection,
-    durationMs: Long,
-    originPlace: Place,
-    destinationPlace: Place
-): Section.Move.Access {
-    val mode = remoteSection.mode ?: "?"
-    val startTime: Date = parse(remoteSection.departure_date_time)
-    return Section.Move.Access(
-        startTime,
-        durationMs,
-        originPlace,
-        destinationPlace,
-        mode
-    )
-}
-
-private fun transfer(
-    remoteSection: NavitiaSection,
-    durationMs: Long,
-    originPlace: Place,
-    destinationPlace: Place
-): Section.Move.Transfer {
-    val mode = remoteSection.transfer_type ?: "?"
-    val startTime: Date = parse(remoteSection.departure_date_time)
-    return Section.Move.Transfer(
-        startTime,
-        durationMs,
-        originPlace,
-        destinationPlace,
-        mode
-    )
 }
