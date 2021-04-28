@@ -47,13 +47,16 @@ class TripSelectionViewModel(
                     "destination is: ${action.destinationId}: ${action.destinationLabel}"
         )
 
+        // Indicate ref:resh
         val stateBefore = _stateLive.value ?: State()
         val newStateBefore = stateBefore.copy(isRefreshing = true)
         withContext(Dispatchers.Main) { _stateLive.value = newStateBefore }
 
+        // Fetch then model
         val navitiaOutcome = fetchJourneys(action.originId, action.destinationId)
         val models = model(navitiaOutcome)
 
+        // Update state
         val state = _stateLive.value ?: State()
         val newState = state.copy(journeys = models, isRefreshing = false)
         withContext(Dispatchers.Main) { _stateLive.value = newState }
