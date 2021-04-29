@@ -17,11 +17,9 @@ import me.cpele.androcommut.tripselection.TripSelectionViewModel.Action
 
 class TripSelectionFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = TripSelectionFragment()
-    }
-
     private var listener: Listener? = null
+    private var refreshLayout: SwipeRefreshLayout? = null
+    private var adapter: TripSelectionAdapter? = null
 
     private val viewModel: TripSelectionViewModel by viewModels {
         ViewModelFactory {
@@ -31,8 +29,6 @@ class TripSelectionFragment : Fragment() {
             )
         }
     }
-
-    private var adapter: TripSelectionAdapter? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -45,26 +41,19 @@ class TripSelectionFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.trip_selection_fragment, container, false)
-    }
+    ): View? = inflater.inflate(R.layout.trip_selection_fragment, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        refreshLayout = view.findViewById(R.id.trip_selection_swipe_refresh)
 
         adapter = TripSelectionAdapter(::onTripSelected)
         val recyclerView: RecyclerView = view.findViewById(R.id.trip_selection_recycler)
         recyclerView.adapter = adapter
 
-        val refreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.trip_selection_swipe_refresh)
-
         viewModel.stateLive.observe(viewLifecycleOwner) { state: TripSelectionViewModel.State ->
-            state.journeys?.let { journeys ->
-                adapter?.submitList(journeys)
-            }
-            state.isRefreshing?.let {
-                refreshLayout.isRefreshing = state.isRefreshing
-            }
+            render(state)
         }
 
         viewModel.eventLive.observe(viewLifecycleOwner) { event ->
@@ -86,7 +75,16 @@ class TripSelectionFragment : Fragment() {
             ?: throw IllegalArgumentException("Arguments must not be null")
 
         viewModel.dispatch(intention)
-        refreshLayout.setOnRefreshListener { viewModel.dispatch(intention) }
+        refreshLayout?.setOnRefreshListener { viewModel.dispatch(intention) }
+    }
+
+    private fun render(state: TripSelectionViewModel.State) {
+        state.journeys?.let { journeys ->
+            adapter?.submitList(journeys)
+        }
+        state.isRefreshing?.let {
+            refreshLayout?.isRefreshing = it
+        }
     }
 
     private fun render(consequence: TripSelectionViewModel.Consequence) {
@@ -102,7 +100,13 @@ class TripSelectionFragment : Fragment() {
 
     override fun onDestroyView() {
         adapter = null
+        refreshLayout = null
         super.onDestroyView()
+    }
+
+    override fun onDetach() {
+        listener = null
+        super.onDetach()
     }
 
     interface Listener {
