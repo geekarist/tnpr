@@ -103,8 +103,13 @@ class TripSelectionViewModel(
 
     data class State(
         val journeys: List<Journey>? = null,
-        val isRefreshing: Boolean? = null
-    )
+        val isRefreshing: Boolean? = null,
+        val status: Status? = null
+    ) {
+        enum class Status {
+            SUCCESS, FAILURE, NOT_FOUND
+        }
+    }
 
     sealed class Consequence {
         data class OpenTrip(val tripId: String) : Consequence()

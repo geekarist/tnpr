@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ViewFlipper
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
@@ -84,6 +85,13 @@ class TripSelectionFragment : Fragment() {
         }
         state.isRefreshing?.let {
             refreshLayout?.isRefreshing = it
+        }
+        val flipper = view?.findViewById<ViewFlipper>(R.id.trip_selection_flipper)
+        flipper?.displayedChild = when (state.status) {
+            null,
+            TripSelectionViewModel.State.Status.SUCCESS -> 1
+            TripSelectionViewModel.State.Status.FAILURE -> 2
+            TripSelectionViewModel.State.Status.NOT_FOUND -> 3
         }
     }
 
