@@ -89,9 +89,9 @@ class TripSelectionFragment : Fragment() {
         val flipper = view?.findViewById<ViewFlipper>(R.id.trip_selection_flipper)
         flipper?.displayedChild = when (state.status) {
             null,
-            TripSelectionViewModel.State.Status.SUCCESS -> 1
-            TripSelectionViewModel.State.Status.FAILURE -> 2
-            TripSelectionViewModel.State.Status.NOT_FOUND -> 3
+            TripSelectionViewModel.State.Status.SUCCESS -> 0
+            TripSelectionViewModel.State.Status.FAILURE -> 1
+            TripSelectionViewModel.State.Status.NOT_FOUND -> 2
         }
     }
 

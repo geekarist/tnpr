@@ -104,7 +104,7 @@ class TripSelectionViewModel(
     data class State(
         val journeys: List<Journey>? = null,
         val isRefreshing: Boolean? = null,
-        val status: Status? = null
+        val status: Status? = Status.SUCCESS
     ) {
         enum class Status {
             SUCCESS, FAILURE, NOT_FOUND
