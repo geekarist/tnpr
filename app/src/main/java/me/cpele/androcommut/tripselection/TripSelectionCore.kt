@@ -11,15 +11,21 @@ import me.cpele.androcommut.core.Place
 import me.cpele.androcommut.core.Section
 import java.util.*
 
-fun model(outcome: Outcome<NavitiaJourneysResult>): List<Journey> =
+data class TripSelectionModel(
+    val journeys: List<Journey>,
+    val errors: List<Exception>
+)
+
+fun model(outcome: Outcome<NavitiaJourneysResult>): TripSelectionModel =
     when (outcome) {
-        is Outcome.Success -> journeys(outcome.value)
-        is Outcome.Failure -> {
-            Log.e(outcome.javaClass.simpleName, "Journey request failed", outcome.error)
-            emptyList()
-        }
-    }.also {
-        Log.d(outcome.javaClass.simpleName, "Converted models: $it")
+        is Outcome.Success -> TripSelectionModel(
+            journeys = journeys(outcome.value),
+            errors = emptyList()
+        )
+        is Outcome.Failure -> TripSelectionModel(
+            journeys = emptyList(),
+            errors = listOf(Exception("Journey request failed", outcome.error))
+        )
     }
 
 private fun journeys(navitiaJourneysResult: NavitiaJourneysResult): List<Journey> =

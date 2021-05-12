@@ -47,18 +47,22 @@ class TripSelectionViewModel(
                     "destination is: ${action.destinationId}: ${action.destinationLabel}"
         )
 
-        // Indicate ref:resh
+        // Indicate refresh
         val stateBefore = _stateLive.value ?: State()
         val newStateBefore = stateBefore.copy(isRefreshing = true)
         withContext(Dispatchers.Main) { _stateLive.value = newStateBefore }
 
         // Fetch then model
         val navitiaOutcome = fetchJourneys(action.originId, action.destinationId)
-        val models = model(navitiaOutcome)
+        val model = model(navitiaOutcome)
+
+        model.errors.forEach { err ->
+            Log.w(javaClass.simpleName, "Errors fetching journeys", err)
+        }
 
         // Update state
         val state = _stateLive.value ?: State()
-        val newState = state.copy(journeys = models, isRefreshing = false)
+        val newState = state.copy(journeys = model.journeys, isRefreshing = false)
         withContext(Dispatchers.Main) { _stateLive.value = newState }
     }
 
@@ -84,7 +88,8 @@ class TripSelectionViewModel(
         val tripId = UUID.nameUUIDFromBytes(action.journey.toString().toByteArray()).toString()
 
         withContext(Dispatchers.IO) {
-            journeyCache.put(tripId, action.journey)
+
+        journeyCache.put(tripId, action.journey)
         }
 
         _eventLive.value = Event(Consequence.OpenTrip(tripId))
