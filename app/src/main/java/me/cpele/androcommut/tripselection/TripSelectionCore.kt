@@ -1,6 +1,5 @@
 package me.cpele.androcommut.tripselection
 
-import android.util.Log
 import me.cpele.afk.Outcome
 import me.cpele.afk.parseDateTime
 import me.cpele.androcommut.NavitiaJourney
@@ -13,26 +12,42 @@ import java.util.*
 
 data class TripSelectionModel(
     val journeys: List<Journey>,
-    val errors: List<Exception>
+    val errors: List<Throwable>
 )
 
 fun model(outcome: Outcome<NavitiaJourneysResult>): TripSelectionModel =
     when (outcome) {
-        is Outcome.Success -> TripSelectionModel(
-            journeys = journeys(outcome.value),
-            errors = emptyList()
-        )
+        is Outcome.Success -> {
+            val result = outcome.value
+            successToModel(result)
+        }
         is Outcome.Failure -> TripSelectionModel(
             journeys = emptyList(),
             errors = listOf(Exception("Journey request failed", outcome.error))
         )
     }
 
-private fun journeys(navitiaJourneysResult: NavitiaJourneysResult): List<Journey> =
-    navitiaJourneysResult.journeys
-        ?.map { remoteJourney -> journey(remoteJourney) }
-        .also { Log.d(navitiaJourneysResult.javaClass.simpleName, "Models: $it") }
+private fun successToModel(result: NavitiaJourneysResult): TripSelectionModel {
+
+    val outcomes: List<Outcome<Journey>> = result.journeys
+        ?.map { remoteJourney ->
+            try {
+                Outcome.Success(journey(remoteJourney))
+            } catch (e: Exception) {
+                Outcome.Failure(e)
+            }
+        }
         ?: emptyList()
+
+    val (journeyOutcomes, errorOutcomes) = outcomes.partition { it is Outcome.Success }
+    val journeys = journeyOutcomes.map { it as Outcome.Success }.map { it.value }
+    val errors = errorOutcomes.map { it as Outcome.Failure }.map { it.error }
+
+    return TripSelectionModel(
+        journeys = journeys,
+        errors = errors
+    )
+}
 
 private fun journey(remoteJourney: NavitiaJourney): Journey {
     val remoteSections = remoteJourney.sections

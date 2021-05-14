@@ -89,7 +89,7 @@ class TripSelectionViewModel(
 
         withContext(Dispatchers.IO) {
 
-        journeyCache.put(tripId, action.journey)
+            journeyCache.put(tripId, action.journey)
         }
 
         _eventLive.value = Event(Consequence.OpenTrip(tripId))
