@@ -41,15 +41,9 @@ class TripSelectionViewModel(
     }
 
     private fun handle(action: Action.Load) = viewModelScope.launch {
-        Log.d(
-            javaClass.simpleName,
-            "Origin is ${action.originId}: ${action.originLabel}, " +
-                    "destination is: ${action.destinationId}: ${action.destinationLabel}"
-        )
 
         // Indicate refresh
-        val stateBefore = _stateLive.value ?: State()
-        val newStateBefore = stateBefore.copy(isRefreshing = true)
+        val newStateBefore = _stateLive.value?.copy(isRefreshing = true)
         withContext(Dispatchers.Main) { _stateLive.value = newStateBefore }
 
         // Fetch then model
@@ -61,18 +55,21 @@ class TripSelectionViewModel(
         }
 
         // Update state
-        val state = _stateLive.value ?: State()
-        val newState = state.copy(
-            journeys = model.journeys,
-            isRefreshing = false,
-            status = when {
-                model.journeys.isEmpty() && model.errors.isNotEmpty() -> State.Status.FAILURE
-                model.journeys.isEmpty() -> State.Status.NOT_FOUND
-                else -> State.Status.SUCCESS
-            }
-        )
+        val newState = _stateLive.value?.updatedWith(model)
         withContext(Dispatchers.Main) { _stateLive.value = newState }
     }
+
+    private fun State.updatedWith(
+        model: TripSelectionModel
+    ): State = copy(
+        journeys = model.journeys,
+        isRefreshing = false,
+        status = when {
+            model.journeys.isEmpty() && model.errors.isNotEmpty() -> State.Status.FAILURE
+            model.journeys.isEmpty() -> State.Status.NOT_FOUND
+            else -> State.Status.SUCCESS
+        }
+    )
 
     private suspend fun fetchJourneys(
         originId: String,
