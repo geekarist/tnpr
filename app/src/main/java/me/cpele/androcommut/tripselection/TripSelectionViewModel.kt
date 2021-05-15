@@ -62,7 +62,15 @@ class TripSelectionViewModel(
 
         // Update state
         val state = _stateLive.value ?: State()
-        val newState = state.copy(journeys = model.journeys, isRefreshing = false)
+        val newState = state.copy(
+            journeys = model.journeys,
+            isRefreshing = false,
+            status = when {
+                model.journeys.isEmpty() && model.errors.isNotEmpty() -> State.Status.FAILURE
+                model.journeys.isEmpty() -> State.Status.NOT_FOUND
+                else -> State.Status.SUCCESS
+            }
+        )
         withContext(Dispatchers.Main) { _stateLive.value = newState }
     }
 
