@@ -85,7 +85,7 @@ private fun description(context: Context, section: Section): String {
         startTime.time,
         DateUtils.FORMAT_SHOW_TIME
     )
-    return when (section) {
+    return "$formattedStartTime\u00a0• " + when (section) {
         is Section.Move -> {
             val mode = section.mode
             val start = section.origin.name
@@ -93,14 +93,14 @@ private fun description(context: Context, section: Section): String {
             when (section) {
                 is Section.Move.PublicTransport -> {
                     val line = section.line
-                    "At $formattedStartTime, take the $mode $line from $start to $end"
+                    "Take the $mode $line from $start to $end"
                 }
                 is Section.Move.Access, is Section.Move.Transfer ->
-                    "At $formattedStartTime, go by $mode from $start to $end"
+                    "Go by $mode from $start to $end"
             }
         }
         is Section.Wait -> {
-            "At $formattedStartTime, wait"
+            "Wait"
         }
     }
 }
