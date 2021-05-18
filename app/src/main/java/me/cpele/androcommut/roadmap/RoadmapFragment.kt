@@ -2,11 +2,16 @@ package me.cpele.androcommut.roadmap
 
 import android.content.Context
 import android.os.Bundle
+import android.text.Spannable
+import android.text.TextUtils
 import android.text.format.DateUtils
+import android.text.style.TextAppearanceSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.text.toSpannable
+import androidx.core.text.toSpanned
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
@@ -78,14 +83,21 @@ fun item(context: Context, section: Section): RoadmapAdapter.Item =
         duration = "${section.durationSec.seconds.inMinutes.roundToInt()} min"
     )
 
-private fun description(context: Context, section: Section): String {
+private fun description(context: Context, section: Section): CharSequence {
     val startTime: Date = section.startTime
-    val formattedStartTime = DateUtils.formatDateTime(
+    val startTimeSpanned = DateUtils.formatDateTime(
         context,
         startTime.time,
         DateUtils.FORMAT_SHOW_TIME
-    )
-    return "$formattedStartTime\u00a0• " + when (section) {
+    ).toSpannable().apply {
+        setSpan(
+            TextAppearanceSpan(context, R.style.TextAppearance_AppCompat_Subhead),
+            0,
+            length,
+            Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+        )
+    }.toSpanned()
+    val sectionDesc = when (section) {
         is Section.Move -> {
             val mode = section.mode
             val start = section.origin.name
@@ -103,4 +115,5 @@ private fun description(context: Context, section: Section): String {
             "Wait"
         }
     }
+    return TextUtils.concat(startTimeSpanned, "\u00a0• ", sectionDesc)
 }

@@ -24,7 +24,7 @@ class RoadmapAdapter : ListAdapter<RoadmapAdapter.Item, RoadmapAdapter.ViewHolde
     override fun onBindViewHolder(holder: ViewHolder, position: Int) =
         holder.bind(getItem(position))
 
-    data class Item(val description: String, val duration: String)
+    data class Item(val description: CharSequence, val duration: String)
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         fun bind(item: Item) {
