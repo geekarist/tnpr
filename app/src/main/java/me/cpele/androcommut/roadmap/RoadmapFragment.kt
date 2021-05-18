@@ -112,7 +112,7 @@ private fun description(context: Context, section: Section): CharSequence {
             }
         }
         is Section.Wait -> {
-            "Wait"
+            "Wait in ${section.place}"
         }
     }
     return TextUtils.concat(startTimeSpanned, "\u00a0• ", sectionDesc)

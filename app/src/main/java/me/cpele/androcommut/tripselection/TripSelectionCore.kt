@@ -83,7 +83,7 @@ private fun section(remoteSection: NavitiaSection): Section {
 
 fun wait(remoteSection: NavitiaSection, duration: Long): Section {
     val startTime: Date = parse(remoteSection.departure_date_time)
-    return Section.Wait(duration, startTime)
+    return Section.Wait(duration, startTime, "Gare du Croc Chantot")
 }
 
 private fun publicTransport(

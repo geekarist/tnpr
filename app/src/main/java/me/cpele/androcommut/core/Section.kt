@@ -42,6 +42,7 @@ sealed class Section {
 
     data class Wait(
         override val durationSec: Long,
-        override val startTime: Date
+        override val startTime: Date,
+        val place: String
     ) : Section()
 }
