@@ -55,9 +55,9 @@ private fun journey(remoteJourney: NavitiaJourney): Journey {
         emptyList()
     } else {
         remoteSections
-            .let { listOf(remoteSections.first()) + remoteSections }
+            .plus(remoteSections.last())
             .zipWithNext()
-            .map { (_, remoteSection) -> section(remoteSection) }
+            .map { (remoteSection, _) -> section(remoteSection) }
     }
     return Journey(sections)
 }
