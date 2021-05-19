@@ -57,12 +57,12 @@ private fun journey(remoteJourney: NavitiaJourney): Journey {
         remoteSections
             .plus(remoteSections.last())
             .zipWithNext()
-            .map { (remoteSection, _) -> section(remoteSection) }
+            .map { (remoteSection, nextRemoteSection) -> section(remoteSection, nextRemoteSection) }
     }
     return Journey(sections)
 }
 
-private fun section(remoteSection: NavitiaSection): Section {
+private fun section(remoteSection: NavitiaSection, nextRemoteSection: NavitiaSection): Section {
     val remoteDuration = remoteSection.duration
     val duration = remoteDuration
         ?: throw IllegalStateException("Duration should not be null for $remoteSection")
@@ -75,7 +75,7 @@ private fun section(remoteSection: NavitiaSection): Section {
             transfer(remoteSection, duration, originPlace, destinationPlace)
         }
         "waiting" -> {
-            wait(remoteSection, duration)
+            wait(remoteSection, nextRemoteSection, duration)
         }
         "street_network", "crow_fly" -> {
             access(remoteSection, duration, originPlace, destinationPlace)
@@ -87,9 +87,14 @@ private fun section(remoteSection: NavitiaSection): Section {
     }
 }
 
-fun wait(remoteSection: NavitiaSection, duration: Long): Section {
+fun wait(
+    remoteSection: NavitiaSection,
+    nextRemoteSection: NavitiaSection,
+    duration: Long
+): Section {
     val startTime: Date = parse(remoteSection.departure_date_time)
-    return Section.Wait(duration, startTime, "Gare du Croc Chantot")
+    val place = nextRemoteSection.from?.name
+    return Section.Wait(duration, startTime, place ?: "?")
 }
 
 private fun publicTransport(
