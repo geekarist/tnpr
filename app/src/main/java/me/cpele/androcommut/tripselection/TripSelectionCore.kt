@@ -51,9 +51,15 @@ private fun successToModel(result: NavitiaJourneysResult): TripSelectionModel {
 
 private fun journey(remoteJourney: NavitiaJourney): Journey {
     val remoteSections = remoteJourney.sections
-    val sections = remoteSections
-        ?.map { remoteSection -> section(remoteSection) }
-    return Journey(sections ?: emptyList())
+    val sections = if (remoteSections.isNullOrEmpty()) {
+        emptyList()
+    } else {
+        remoteSections
+            .let { listOf(remoteSections.first()) + remoteSections }
+            .zipWithNext()
+            .map { (_, remoteSection) -> section(remoteSection) }
+    }
+    return Journey(sections)
 }
 
 private fun section(remoteSection: NavitiaSection): Section {
