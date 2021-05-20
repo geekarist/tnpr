@@ -107,13 +107,18 @@ private fun description(context: Context, section: Section): CharSequence {
                     val line = section.line
                     "Take the $mode $line from $start to $end"
                 }
-                is Section.Move.Access, is Section.Move.Transfer ->
-                    "Go by $mode from $start to $end"
+                is Section.Move.Access ->
+                    "Access by $mode ${fromToOrAt(start, end)}"
+                is Section.Move.Transfer ->
+                    "Transfer by $mode ${fromToOrAt(start, end)}"
             }
         }
         is Section.Wait -> {
-            "Wait in ${section.place}"
+            "Wait at ${section.place}"
         }
     }
     return TextUtils.concat(startTimeSpanned, "\u00a0• ", sectionDesc)
 }
+
+private fun fromToOrAt(start: String, end: String) =
+    if (start != end) "from $start to $end" else "at $start"
