@@ -2,7 +2,6 @@
 
 package me.cpele.androcommut.roadmap
 
-import android.util.Log
 import android.util.LruCache
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -44,7 +43,6 @@ class RoadmapViewModel(private val journeyCache: LruCache<String, Journey>) : Vi
 
     private fun recallTrip(tripId: String) {
         val recalled = journeyCache.get(tripId)
-        Log.d(javaClass.simpleName, "Recalled trip: $recalled")
         inputFlow.value = Input.TripRecalled(tripId, recalled)
     }
 

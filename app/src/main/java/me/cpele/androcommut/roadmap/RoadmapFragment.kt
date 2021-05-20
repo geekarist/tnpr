@@ -6,7 +6,6 @@ import android.text.Spannable
 import android.text.TextUtils
 import android.text.format.DateUtils
 import android.text.style.TextAppearanceSpan
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -48,7 +47,6 @@ class RoadmapFragment : Fragment() {
         val recyclerView = view.findViewById<RecyclerView>(R.id.roadmap_recycler)
         recyclerView.adapter = adapter
         viewModel.state.observe(viewLifecycleOwner) { state ->
-            Log.d(javaClass.simpleName, "State: $state")
             val items = items(requireContext(), state?.journeyOutcome)
             adapter.submitList(items)
         }

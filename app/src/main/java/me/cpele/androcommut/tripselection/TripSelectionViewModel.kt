@@ -88,7 +88,6 @@ class TripSelectionViewModel(
     }
 
     private fun handle(action: Action.Select) = viewModelScope.launch {
-        Log.d(javaClass.simpleName, "Selected trip: ${action.journey}")
 
         val tripId = UUID.nameUUIDFromBytes(action.journey.toString().toByteArray()).toString()
 
