@@ -38,26 +38,28 @@ class OriginDestinationViewModel(private val app: Application) : ViewModel(),
 
             val state = stateLive.value
 
-            val (effect, newState) = when (action) {
-                is Action.Load -> null to state?.process(action)
-                is Action.OriginClicked -> Effect.NavigateToAutosuggest.Origin(
-                    state?.originId,
-                    state?.originLabel
-                ) to state
-                is Action.DestinationClicked -> Effect.NavigateToAutosuggest.Destination(
-                    state?.destinationId,
-                    state?.destinationLabel
-                ) to state
-                is Action.ActionClicked -> Effect.NavigateToTripSelection(
-                    originId = state?.originId
-                        ?: throw IllegalStateException("State is missing an origin ID: $state"),
-                    originLabel = state.originLabel
-                        ?: throw IllegalStateException("State is missing an origin label: $state"),
-                    destinationId = state.destinationId
-                        ?: throw IllegalStateException("State is missing a destination ID: $state"),
-                    destinationLabel = state.destinationLabel
-                        ?: throw IllegalStateException("State is missing a destination label: $state")
-                ) to state
+            val (effect, newState) = withContext(Dispatchers.Default) {
+                when (action) {
+                    is Action.Load -> null to state?.process(action)
+                    is Action.OriginClicked -> Effect.NavigateToAutosuggest.Origin(
+                        state?.originId,
+                        state?.originLabel
+                    ) to state
+                    is Action.DestinationClicked -> Effect.NavigateToAutosuggest.Destination(
+                        state?.destinationId,
+                        state?.destinationLabel
+                    ) to state
+                    is Action.ActionClicked -> Effect.NavigateToTripSelection(
+                        originId = state?.originId
+                            ?: throw IllegalStateException("State is missing an origin ID: $state"),
+                        originLabel = state.originLabel
+                            ?: throw IllegalStateException("State is missing an origin label: $state"),
+                        destinationId = state.destinationId
+                            ?: throw IllegalStateException("State is missing a destination ID: $state"),
+                        destinationLabel = state.destinationLabel
+                            ?: throw IllegalStateException("State is missing a destination label: $state")
+                    ) to state
+                }
             }
 
             withContext(Dispatchers.Main) {
