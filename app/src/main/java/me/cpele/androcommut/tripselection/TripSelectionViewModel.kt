@@ -43,19 +43,27 @@ class TripSelectionViewModel(
     private fun handle(action: Action.Load) = viewModelScope.launch {
 
         // Indicate refresh
-        val newStateBefore = _stateLive.value?.copy(isRefreshing = true)
+        val newStateBefore = withContext(Dispatchers.Default) {
+            _stateLive.value?.copy(isRefreshing = true)
+        }
         withContext(Dispatchers.Main) { _stateLive.value = newStateBefore }
 
         // Fetch then model
         val navitiaOutcome = fetchJourneys(action.originId, action.destinationId)
-        val model = model(navitiaOutcome)
+        val model = withContext(Dispatchers.Default) {
+            model(navitiaOutcome)
+        }
 
-        model.errors.forEach { err ->
-            Log.w(javaClass.simpleName, "Errors fetching journeys", err)
+        withContext(Dispatchers.Default) {
+            model.errors.forEach { err ->
+                Log.w(javaClass.simpleName, "Errors fetching journeys", err)
+            }
         }
 
         // Update state
-        val newState = _stateLive.value?.updatedWith(model)
+        val newState = withContext(Dispatchers.Default) {
+            _stateLive.value?.updatedWith(model)
+        }
         withContext(Dispatchers.Main) { _stateLive.value = newState }
     }
 

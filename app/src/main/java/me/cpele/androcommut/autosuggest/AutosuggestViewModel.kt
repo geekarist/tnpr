@@ -39,40 +39,64 @@ class AutosuggestViewModel(
 
     private val queryFlow = MutableStateFlow(Query(null))
 
+
+    private sealed class InitialOperation {
+        data class PostEmptyState(val stateValue: State?) : InitialOperation()
+        object Pass : InitialOperation()
+    }
+
     init {
         queryFlow
             .map { it.value }
-            .onEach { query ->
-                if (query.isNullOrBlank()) {
-                    _stateLive.value = _stateLive.value?.copy(
-                        answer = SuggestAnswerUiModel.Some(emptyList()),
-                        isQueryClearable = false
+            .flowOn(Dispatchers.Default)
+            .map { query ->
+                query to if (query.isNullOrBlank()) {
+                    InitialOperation.PostEmptyState(
+                        _stateLive.value?.copy(
+                            answer = SuggestAnswerUiModel.Some(emptyList()),
+                            isQueryClearable = false
+                        )
                     )
+                } else {
+                    InitialOperation.Pass
+                }
+            }
+            .onEach { (_, initialOp) ->
+                if (initialOp is InitialOperation.PostEmptyState) {
+                    _stateLive.value = initialOp.stateValue
                 }
             }
             .flowOn(Dispatchers.Main)
+            .map { (query, _) -> query }
             .filterNot { it.isNullOrBlank() }
             .flowOn(Dispatchers.Default)
-            .onEach {
-                _stateLive.value = _stateLive.value?.copy(
+            .map { query ->
+                query to _stateLive.value?.copy(
                     isRefreshing = true,
                     isQueryClearable = false
                 )
             }
+            .flowOn(Dispatchers.Default)
+            .onEach { (_, stateAtStart) ->
+                _stateLive.value = stateAtStart
+            }
             .flowOn(Dispatchers.Main)
             .debounce(1000)
+            .map { (query, _) -> query }
             .filterNotNull()
             .flowOn(Dispatchers.Default)
             .map { query -> fetchPlaces(query) }
             .flowOn(Dispatchers.IO)
             .map { result -> result.toUiModel() }
-            .flowOn(Dispatchers.Default)
-            .onEach { uiModel ->
-                val newState = stateLive.value?.copy(
+            .map { uiModel ->
+                stateLive.value?.copy(
                     answer = uiModel,
                     isRefreshing = false,
                     isQueryClearable = true
                 )
+            }
+            .flowOn(Dispatchers.Default)
+            .onEach { newState ->
                 _stateLive.value = newState
             }
             .flowOn(Dispatchers.Main)
@@ -80,7 +104,6 @@ class AutosuggestViewModel(
     }
 
     private suspend fun fetchPlaces(query: String): Outcome<NavitiaPlacesResult> =
-//        Outcome.Failure(Exception())
         try {
             val response = navitiaService.places(auth = BuildConfig.NAVITIA_API_KEY, q = query)
             Outcome.Success(response)
