@@ -57,7 +57,7 @@ private sealed class Input {
     data class TripRecalled(val id: String, val journey: Journey?) : Input()
 }
 
-private sealed class Output { // TODO: Make private
+private sealed class Output {
     data class RecallTrip(val tripId: String) : Output()
     data class ChangeState(val journeyOutcome: Outcome<Journey>) : Output()
 }
