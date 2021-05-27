@@ -47,60 +47,61 @@ class AutosuggestViewModel(
 
     init {
         queryFlow
-            .map { it.value }
-            .flowOn(Dispatchers.Default)
-            .map { query ->
-                query to if (query.isNullOrBlank()) {
-                    InitialOperation.PostEmptyState(
-                        _stateLive.value?.copy(
-                            answer = SuggestAnswerUiModel.Some(emptyList()),
-                            isQueryClearable = false
-                        )
-                    )
-                } else {
-                    InitialOperation.Pass
-                }
-            }
-            .onEach { (_, initialOp) ->
-                if (initialOp is InitialOperation.PostEmptyState) {
-                    _stateLive.value = initialOp.stateValue
-                }
-            }
-            .flowOn(Dispatchers.Main)
-            .map { (query, _) -> query }
-            .filterNot { it.isNullOrBlank() }
-            .flowOn(Dispatchers.Default)
-            .map { query ->
-                query to _stateLive.value?.copy(
-                    isRefreshing = true,
-                    isQueryClearable = false
-                )
-            }
-            .flowOn(Dispatchers.Default)
-            .onEach { (_, stateAtStart) ->
-                _stateLive.value = stateAtStart
-            }
-            .flowOn(Dispatchers.Main)
+            // 0. Prepare and filter query
             .debounce(1000)
-            .map { (query, _) -> query }
+            .map { it.value }
             .filterNotNull()
+            // 1. Initial state and post
+            .map { query -> pairQueryToInitialOp(query) }
             .flowOn(Dispatchers.Default)
-            .map { query -> fetchPlaces(query) }
+            .onEach { (_, initialOp) -> maybePostEmptyState(initialOp) }
+            .flowOn(Dispatchers.Main)
+            // 2. State at start (loading) and post
+            .filterNot { (query, _) -> query.isBlank() }
+            .map { (query, _) -> pairQueryToStateAtStart(query) }
+            .flowOn(Dispatchers.Default)
+            .onEach { (_, stateAtStart) -> _stateLive.value = stateAtStart }
+            .flowOn(Dispatchers.Main)
+            // 3. Fetch suggestions
+            .map { (query, _) -> fetchPlaces(query) }
             .flowOn(Dispatchers.IO)
+            // 4. Map to UI model then post final state
             .map { result -> result.toUiModel() }
-            .map { uiModel ->
-                stateLive.value?.copy(
-                    answer = uiModel,
-                    isRefreshing = false,
-                    isQueryClearable = true
-                )
-            }
+            .map { uiModel -> mapToFinalState(uiModel) }
             .flowOn(Dispatchers.Default)
-            .onEach { newState ->
-                _stateLive.value = newState
-            }
+            .onEach { newState -> _stateLive.value = newState }
             .flowOn(Dispatchers.Main)
             .launchIn(viewModelScope)
+    }
+
+    private fun mapToFinalState(uiModel: SuggestAnswerUiModel) =
+        stateLive.value?.copy(
+            answer = uiModel,
+            isRefreshing = false,
+            isQueryClearable = true
+        )
+
+    private fun pairQueryToStateAtStart(query: String) =
+        query to _stateLive.value?.copy(
+            isRefreshing = true,
+            isQueryClearable = false
+        )
+
+    private fun maybePostEmptyState(initialOp: InitialOperation) {
+        if (initialOp is InitialOperation.PostEmptyState) {
+            _stateLive.value = initialOp.stateValue
+        }
+    }
+
+    private fun pairQueryToInitialOp(query: String) = query to if (query.isBlank()) {
+        InitialOperation.PostEmptyState(
+            _stateLive.value?.copy(
+                answer = SuggestAnswerUiModel.Some(emptyList()),
+                isQueryClearable = false
+            )
+        )
+    } else {
+        InitialOperation.Pass
     }
 
     private suspend fun fetchPlaces(query: String): Outcome<NavitiaPlacesResult> =
