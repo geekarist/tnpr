@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AndroCommut</string>
+    <string name="od_origin">Origine</string>
+    <string name="od_destination">Destination</string>
+    <string name="od_default_instructions">Choisissez une origine et une destination</string>
+    <string name="od_search">Rechercher</string>
+    <string name="autosuggest_place">Lieu</string>
+    <string name="autosuggest_search_query">Recherche</string>
+    <string name="autosuggest_unknown_place">Lieu inconnu</string>
+    <string name="od_origin_instructions">Choisissez une origine</string>
+    <string name="od_destination_instructions">Choisissez une destination</string>
+    <string name="od_ready_instructions">Votre choix est fait. Allons-y !</string>
+    <string name="trip_from">Depuis : %1$s</string>
+    <string name="trip_to">Vers : %1$s</string>
+    <string name="autosuggest_not_found">Aucune suggestion trouvée</string>
+    <string name="autosuggest_error">Erreur en recherchant des suggestions</string>
+    <string name="autosuggest_retry">Réessayer</string>
+    <string name="journey_selection_not_found">Aucun itinéraire trouvé</string>
+    <string name="journey_selection_error">Erreur en recherchant des itinéraires</string>
+    <string name="roadmap_section_duration">%1$d min</string>
+    <string name="roadmap_public_transport_section_desc">Prenez le %1$s %2$s depuis %3$s vers %4$s</string>
+    <string name="roadmap_access_section_desc" >Accès en %1$s %2$s</string>
+    <string name="roadmap_transfer_section_desc">Correspondance en %1$s %2$s</string>
+    <string name="roadmap_wait_section_desc">Attendre à %1$s</string>
+    <string name="roadmap_from_to">depuis %1$s vers %2$s</string>
+    <string name="roadmap_at">à %1$s</string>
+</resources>

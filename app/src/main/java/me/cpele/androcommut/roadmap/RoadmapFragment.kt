@@ -54,10 +54,9 @@ class RoadmapFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        val args =
-            arguments?.let { RoadmapFragmentArgs.fromBundle(it) } ?: throw IllegalArgumentException(
-                "Invalid arguments: $arguments"
-            )
+        val args = arguments
+            ?.let { RoadmapFragmentArgs.fromBundle(it) }
+            ?: throw IllegalArgumentException("Invalid arguments: $arguments")
         viewModel.load(args.tripId)
     }
 }
@@ -78,7 +77,10 @@ fun items(context: Context, journey: Journey): List<RoadmapAdapter.Item> =
 fun item(context: Context, section: Section): RoadmapAdapter.Item =
     RoadmapAdapter.Item(
         description = description(context, section),
-        duration = "${section.durationSec.seconds.inMinutes.roundToInt()} min"
+        duration = context.getString(
+            R.string.roadmap_section_duration,
+            section.durationSec.seconds.inMinutes.roundToInt()
+        )
     )
 
 private fun description(context: Context, section: Section): CharSequence {
@@ -103,20 +105,28 @@ private fun description(context: Context, section: Section): CharSequence {
             when (section) {
                 is Section.Move.PublicTransport -> {
                     val line = section.line
-                    "Take the $mode $line from $start to $end"
+                    context.getString(R.string.roadmap_public_transport_section_desc, mode, line, start, end)
                 }
-                is Section.Move.Access ->
-                    "Access by $mode ${fromToOrAt(start, end)}"
-                is Section.Move.Transfer ->
-                    "Transfer by $mode ${fromToOrAt(start, end)}"
+                is Section.Move.Access -> {
+                    val fromToOrAt = fromToOrAt(context, start, end)
+                    context.getString(R.string.roadmap_access_section_desc, mode, fromToOrAt)
+                }
+                is Section.Move.Transfer -> {
+                    val fromToOrAt = fromToOrAt(context, start, end)
+                    context.getString(R.string.roadmap_transfer_section_desc, mode, fromToOrAt)
+                }
             }
         }
         is Section.Wait -> {
-            "Wait at ${section.place}"
+            context.getString(R.string.roadmap_wait_section_desc, section.place)
         }
     }
     return TextUtils.concat(startTimeSpanned, "\u00a0• ", sectionDesc)
 }
 
-private fun fromToOrAt(start: String, end: String) =
-    if (start != end) "from $start to $end" else "at $start"
+private fun fromToOrAt(context: Context, start: String, end: String) =
+    if (start != end) {
+        context.getString(R.string.roadmap_from_to, start, end)
+    } else {
+        context.getString(R.string.roadmap_at, start)
+    }

@@ -17,4 +17,11 @@
     <string name="autosuggest_retry">Retry</string>
     <string name="journey_selection_not_found">No journey found</string>
     <string name="journey_selection_error">Error searching for journeys</string>
+    <string name="roadmap_section_duration">"%1$d min"</string>
+    <string name="roadmap_public_transport_section_desc">Take the %1$s %2$s from %3$s to %4$s</string>
+    <string name="roadmap_access_section_desc">Access by %1$s %2$s</string>
+    <string name="roadmap_transfer_section_desc">Transfer by %1$s %2$s</string>
+    <string name="roadmap_wait_section_desc">Wait at %1$s</string>
+    <string name="roadmap_from_to">from %1$s to %2$s</string>
+    <string name="roadmap_at">at %1$s</string>
 </resources>
