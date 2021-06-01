@@ -7,7 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ViewFlipper
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.get
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import me.cpele.afk.ViewModelFactory
@@ -22,14 +23,7 @@ class TripSelectionFragment : Fragment() {
     private var refreshLayout: SwipeRefreshLayout? = null
     private var adapter: TripSelectionAdapter? = null
 
-    private val viewModel: TripSelectionViewModel by viewModels {
-        ViewModelFactory {
-            TripSelectionViewModel(
-                CustomApp.instance.navitiaService,
-                CustomApp.instance.journeyCache
-            )
-        }
-    }
+    private lateinit var viewModel: TripSelectionViewModel
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -47,6 +41,26 @@ class TripSelectionFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val initialAction = arguments
+            ?.let { TripSelectionFragmentArgs.fromBundle(it) }
+            ?.let {
+                Action.Load(
+                    it.originId,
+                    it.originLabel,
+                    it.destinationId,
+                    it.destinationLabel
+                )
+            }
+            ?: throw IllegalArgumentException("Arguments must not be null")
+
+        viewModel = ViewModelProvider(this, ViewModelFactory {
+            TripSelectionViewModel(
+                CustomApp.instance.navitiaService,
+                CustomApp.instance.journeyCache,
+                initialAction
+            )
+        }).get()
+
         refreshLayout = view.findViewById(R.id.trip_selection_swipe_refresh)
 
         adapter = TripSelectionAdapter(::onTripSelected)
@@ -63,20 +77,7 @@ class TripSelectionFragment : Fragment() {
             }
         }
 
-        val intention = arguments
-            ?.let { TripSelectionFragmentArgs.fromBundle(it) }
-            ?.let {
-                Action.Load(
-                    it.originId,
-                    it.originLabel,
-                    it.destinationId,
-                    it.destinationLabel
-                )
-            }
-            ?: throw IllegalArgumentException("Arguments must not be null")
-
-        viewModel.dispatch(intention)
-        refreshLayout?.setOnRefreshListener { viewModel.dispatch(intention) }
+        refreshLayout?.setOnRefreshListener { viewModel.dispatch(initialAction) }
     }
 
     private fun render(state: TripSelectionViewModel.State) {

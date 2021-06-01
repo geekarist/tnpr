@@ -22,7 +22,8 @@ import java.util.*
 
 class TripSelectionViewModel(
     private val navitiaService: NavitiaService,
-    private val journeyCache: LruCache<String, Journey>
+    private val journeyCache: LruCache<String, Journey>,
+    initialAction: Action
 ) : ViewModel(), Component<Action, State, Consequence> {
 
     private val _stateLive = MutableLiveData(State(isRefreshing = true))
@@ -32,6 +33,10 @@ class TripSelectionViewModel(
     private val _eventLive = MutableLiveData<Event<Consequence>>()
     override val eventLive: LiveData<Event<Consequence>>
         get() = _eventLive
+
+    init {
+        dispatch(initialAction)
+    }
 
     override fun dispatch(action: Action) {
         when (action) {
