@@ -20,9 +20,16 @@
     <string name="journey_selection_error">Erreur en recherchant des itinéraires</string>
     <string name="roadmap_section_duration">%1$d min</string>
     <string name="roadmap_public_transport_section_desc">Prenez le %1$s %2$s depuis %3$s vers %4$s</string>
-    <string name="roadmap_access_section_desc" >Accès en %1$s %2$s</string>
+    <string name="roadmap_access_section_desc">Accès en %1$s %2$s</string>
     <string name="roadmap_transfer_section_desc">Correspondance en %1$s %2$s</string>
     <string name="roadmap_wait_section_desc">Attendre à %1$s</string>
     <string name="roadmap_from_to">depuis %1$s vers %2$s</string>
     <string name="roadmap_at">à %1$s</string>
+    <string name="roadmap_mode_walking">marche à pied</string>
+    <string name="roadmap_mode_car">voiture</string>
+    <string name="roadmap_mode_bike_personal">vélo personnel</string>
+    <string name="roadmap_mode_bike_sharing">vélo partagé</string>
+    <string name="roadmap_mode_ride_sharing">covoiturage</string>
+    <string name="roadmap_mode_taxi">taxi</string>
+    <string name="roadmap_mode_unknown">mode inconnu</string>
 </resources>

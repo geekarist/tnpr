@@ -24,4 +24,11 @@
     <string name="roadmap_wait_section_desc">Wait at %1$s</string>
     <string name="roadmap_from_to">from %1$s to %2$s</string>
     <string name="roadmap_at">at %1$s</string>
+    <string name="roadmap_mode_walking">walking</string>
+    <string name="roadmap_mode_car">car</string>
+    <string name="roadmap_mode_bike_personal">personal bike</string>
+    <string name="roadmap_mode_bike_sharing">bike sharing</string>
+    <string name="roadmap_mode_ride_sharing">ride sharing</string>
+    <string name="roadmap_mode_taxi">taxi</string>
+    <string name="roadmap_mode_unknown">unknown mode</string>
 </resources>

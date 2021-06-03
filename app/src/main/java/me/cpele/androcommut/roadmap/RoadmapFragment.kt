@@ -99,13 +99,19 @@ private fun description(context: Context, section: Section): CharSequence {
     }.toSpanned()
     val sectionDesc = when (section) {
         is Section.Move -> {
-            val mode = section.mode
+            val mode = translateMode(context, section)
             val start = section.origin.name
             val end = section.destination.name
             when (section) {
                 is Section.Move.PublicTransport -> {
                     val line = section.line
-                    context.getString(R.string.roadmap_public_transport_section_desc, mode, line, start, end)
+                    context.getString(
+                        R.string.roadmap_public_transport_section_desc,
+                        mode,
+                        line,
+                        start,
+                        end
+                    )
                 }
                 is Section.Move.Access -> {
                     val fromToOrAt = fromToOrAt(context, start, end)
@@ -123,6 +129,17 @@ private fun description(context: Context, section: Section): CharSequence {
     }
     return TextUtils.concat(startTimeSpanned, "\u00a0• ", sectionDesc)
 }
+
+private fun translateMode(context: Context, section: Section.Move) =
+    when (section.mode) {
+        "walking" -> context.getString(R.string.roadmap_mode_walking)
+        "car" -> context.getString(R.string.roadmap_mode_car)
+        "bike" -> context.getString(R.string.roadmap_mode_bike_personal)
+        "bss" -> context.getString(R.string.roadmap_mode_bike_sharing)
+        "ridesharing" -> context.getString(R.string.roadmap_mode_ride_sharing)
+        "taxi" -> context.getString(R.string.roadmap_mode_taxi)
+        else -> section.mode
+    }
 
 private fun fromToOrAt(context: Context, start: String, end: String) =
     if (start != end) {
