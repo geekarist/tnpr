@@ -15,11 +15,14 @@ data class TripSelectionModel(
     val errors: List<Throwable>
 )
 
-fun model(outcome: Outcome<NavitiaJourneysResult>): TripSelectionModel =
+fun model(
+    translator: TripSelectionTranslator,
+    outcome: Outcome<NavitiaJourneysResult>
+): TripSelectionModel =
     when (outcome) {
         is Outcome.Success -> {
             val result = outcome.value
-            successToModel(result)
+            successToModel(translator, result)
         }
         is Outcome.Failure -> TripSelectionModel(
             journeys = emptyList(),
@@ -27,12 +30,15 @@ fun model(outcome: Outcome<NavitiaJourneysResult>): TripSelectionModel =
         )
     }
 
-private fun successToModel(result: NavitiaJourneysResult): TripSelectionModel {
+private fun successToModel(
+    translator: TripSelectionTranslator,
+    result: NavitiaJourneysResult
+): TripSelectionModel {
 
     val outcomes: List<Outcome<Journey>> = result.journeys
         ?.map { remoteJourney ->
             try {
-                Outcome.Success(journey(remoteJourney))
+                Outcome.Success(journey(translator, remoteJourney))
             } catch (e: Exception) {
                 Outcome.Failure(e)
             }
@@ -49,7 +55,7 @@ private fun successToModel(result: NavitiaJourneysResult): TripSelectionModel {
     )
 }
 
-private fun journey(remoteJourney: NavitiaJourney): Journey {
+private fun journey(translator: TripSelectionTranslator, remoteJourney: NavitiaJourney): Journey {
     val remoteSections = remoteJourney.sections
     val sections = if (remoteSections.isNullOrEmpty()) {
         emptyList()
@@ -57,12 +63,22 @@ private fun journey(remoteJourney: NavitiaJourney): Journey {
         remoteSections
             .plus(remoteSections.last())
             .zipWithNext()
-            .map { (remoteSection, nextRemoteSection) -> section(remoteSection, nextRemoteSection) }
+            .map { (remoteSection, nextRemoteSection) ->
+                section(
+                    translator,
+                    remoteSection,
+                    nextRemoteSection
+                )
+            }
     }
     return Journey(sections)
 }
 
-private fun section(remoteSection: NavitiaSection, nextRemoteSection: NavitiaSection): Section {
+private fun section(
+    translator: TripSelectionTranslator,
+    remoteSection: NavitiaSection,
+    nextRemoteSection: NavitiaSection
+): Section {
     val remoteDuration = remoteSection.duration
     val duration = remoteDuration
         ?: throw IllegalStateException("Duration should not be null for $remoteSection")
@@ -72,13 +88,13 @@ private fun section(remoteSection: NavitiaSection, nextRemoteSection: NavitiaSec
     val destinationPlace = Place(to)
     return when (remoteSection.type) {
         "transfer" -> {
-            transfer(remoteSection, duration, originPlace, destinationPlace)
+            transfer(translator, remoteSection, duration, originPlace, destinationPlace)
         }
         "waiting" -> {
             wait(remoteSection, nextRemoteSection, duration)
         }
         "street_network", "crow_fly" -> {
-            access(remoteSection, duration, originPlace, destinationPlace)
+            access(translator, remoteSection, duration, originPlace, destinationPlace)
         }
         "public_transport" -> {
             publicTransport(remoteSection, duration, originPlace, destinationPlace)
@@ -119,12 +135,13 @@ private fun publicTransport(
 fun parse(dateTimeStr: String?): Date = parseDateTime(dateTimeStr) ?: Date()
 
 private fun access(
+    translator: TripSelectionTranslator,
     remoteSection: NavitiaSection,
     durationMs: Long,
     originPlace: Place,
     destinationPlace: Place
 ): Section.Move.Access {
-    val mode = remoteSection.mode ?: "?"
+    val mode = translator.processMode(remoteSection.mode) ?: "?"
     val startTime: Date = parse(remoteSection.departure_date_time)
     return Section.Move.Access(
         startTime,
@@ -136,12 +153,13 @@ private fun access(
 }
 
 private fun transfer(
+    translator: TripSelectionTranslator,
     remoteSection: NavitiaSection,
     durationMs: Long,
     originPlace: Place,
     destinationPlace: Place
 ): Section.Move.Transfer {
-    val mode = remoteSection.transfer_type ?: "?"
+    val mode = translator.processTransferType(remoteSection.transfer_type) ?: "?"
     val startTime: Date = parse(remoteSection.departure_date_time)
     return Section.Move.Transfer(
         startTime,

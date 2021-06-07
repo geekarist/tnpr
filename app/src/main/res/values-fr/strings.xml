@@ -32,4 +32,7 @@
     <string name="roadmap_mode_ride_sharing">covoiturage</string>
     <string name="roadmap_mode_taxi">taxi</string>
     <string name="roadmap_mode_unknown">mode inconnu</string>
+    <string name="journey_selection_transfer_type_walking">Marche à pieds</string>
+    <string name="journey_selection_transfer_type_stay_in">Attendant</string>
+    <string name="journey_selection_transfer_type_unknown">Mode inconnu</string>
 </resources>

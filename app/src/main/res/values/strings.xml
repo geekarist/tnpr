@@ -31,4 +31,7 @@
     <string name="roadmap_mode_ride_sharing">ride sharing</string>
     <string name="roadmap_mode_taxi">taxi</string>
     <string name="roadmap_mode_unknown">unknown mode</string>
+    <string name="journey_selection_transfer_type_walking">Walking</string>
+    <string name="journey_selection_transfer_type_stay_in">Staying in</string>
+    <string name="journey_selection_transfer_type_unknown">Unknown mode</string>
 </resources>

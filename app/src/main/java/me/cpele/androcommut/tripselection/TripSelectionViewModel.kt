@@ -1,5 +1,6 @@
 package me.cpele.androcommut.tripselection
 
+import android.app.Application
 import android.util.Log
 import android.util.LruCache
 import androidx.lifecycle.LiveData
@@ -16,6 +17,7 @@ import me.cpele.afk.exhaust
 import me.cpele.androcommut.BuildConfig
 import me.cpele.androcommut.NavitiaJourneysResult
 import me.cpele.androcommut.NavitiaService
+import me.cpele.androcommut.R
 import me.cpele.androcommut.core.Journey
 import me.cpele.androcommut.tripselection.TripSelectionViewModel.*
 import java.util.*
@@ -23,8 +25,9 @@ import java.util.*
 class TripSelectionViewModel(
     private val navitiaService: NavitiaService,
     private val journeyCache: LruCache<String, Journey>,
+    private val application: Application,
     initialAction: Action
-) : ViewModel(), Component<Action, State, Consequence> {
+) : ViewModel(), Component<Action, State, Consequence>, TripSelectionTranslator {
 
     private val _stateLive = MutableLiveData(State(isRefreshing = true))
     override val stateLive: LiveData<State>
@@ -56,7 +59,7 @@ class TripSelectionViewModel(
         // Fetch then model
         val navitiaOutcome = fetchJourneys(action.originId, action.destinationId)
         val model = withContext(Dispatchers.Default) {
-            model(navitiaOutcome)
+            model(this@TripSelectionViewModel, navitiaOutcome)
         }
 
         withContext(Dispatchers.Default) {
@@ -136,4 +139,22 @@ class TripSelectionViewModel(
     sealed class Consequence {
         data class OpenTrip(val tripId: String) : Consequence()
     }
+
+    override fun processTransferType(transferType: String?): String =
+        when (transferType) {
+            "walking" -> application.getString(R.string.journey_selection_transfer_type_walking)
+            "stay_in" -> application.getString(R.string.journey_selection_transfer_type_stay_in)
+            else -> application.getString(R.string.journey_selection_transfer_type_unknown)
+        }
+
+    override fun processMode(mode: String?): String? =
+        when (mode) {
+            "walking" -> application.getString(R.string.roadmap_mode_walking)
+            "car" -> application.getString(R.string.roadmap_mode_car)
+            "bike" -> application.getString(R.string.roadmap_mode_bike_personal)
+            "bss" -> application.getString(R.string.roadmap_mode_bike_sharing)
+            "ridesharing" -> application.getString(R.string.roadmap_mode_ride_sharing)
+            "taxi" -> application.getString(R.string.roadmap_mode_taxi)
+            else -> mode
+        }
 }

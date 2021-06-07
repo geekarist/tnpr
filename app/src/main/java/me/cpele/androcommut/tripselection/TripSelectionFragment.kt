@@ -57,6 +57,7 @@ class TripSelectionFragment : Fragment() {
             TripSelectionViewModel(
                 CustomApp.instance.navitiaService,
                 CustomApp.instance.journeyCache,
+                CustomApp.instance,
                 initialAction
             )
         }).get()
