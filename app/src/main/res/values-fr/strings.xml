@@ -25,14 +25,14 @@
     <string name="roadmap_wait_section_desc">Attendre à %1$s</string>
     <string name="roadmap_from_to">depuis %1$s vers %2$s</string>
     <string name="roadmap_at">à %1$s</string>
-    <string name="roadmap_mode_walking">marche à pied</string>
+    <string name="roadmap_mode_walking">marche</string>
     <string name="roadmap_mode_car">voiture</string>
     <string name="roadmap_mode_bike_personal">vélo personnel</string>
     <string name="roadmap_mode_bike_sharing">vélo partagé</string>
     <string name="roadmap_mode_ride_sharing">covoiturage</string>
     <string name="roadmap_mode_taxi">taxi</string>
     <string name="roadmap_mode_unknown">mode inconnu</string>
-    <string name="journey_selection_transfer_type_walking">Marche à pieds</string>
-    <string name="journey_selection_transfer_type_stay_in">Attendant</string>
-    <string name="journey_selection_transfer_type_unknown">Mode inconnu</string>
+    <string name="journey_selection_transfer_type_walking">marche</string>
+    <string name="journey_selection_transfer_type_stay_in">attendant</string>
+    <string name="journey_selection_transfer_type_unknown">mode inconnu</string>
 </resources>
