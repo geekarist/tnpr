@@ -9,7 +9,7 @@ android {
     compileSdkVersion 30
 
     defaultConfig {
-        applicationId "me.cpele.androcommut"
+        applicationId "me.cpele.tnpr"
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 1

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">AndroCommut</string>
+    <string name="app_name">TNPR</string>
     <string name="od_origin">Origine</string>
     <string name="od_destination">Destination</string>
     <string name="od_default_instructions">Choisissez une origine et une destination</string>

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AndroCommut</string>
+    <string name="app_name">TNPR</string>
     <string name="od_origin">Origin</string>
     <string name="od_destination">Destination</string>
     <string name="od_default_instructions">Please choose an origin and a destination</string>
