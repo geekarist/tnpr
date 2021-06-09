@@ -13,6 +13,7 @@ import kotlinx.coroutines.withContext
 import me.cpele.afk.Component
 import me.cpele.afk.Event
 import me.cpele.afk.Outcome
+import me.cpele.afk.exhaust
 import me.cpele.tnpr.BuildConfig
 import me.cpele.tnpr.NavitiaJourneysResult
 import me.cpele.tnpr.NavitiaService
