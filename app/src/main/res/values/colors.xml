@@ -7,4 +7,11 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="wood_dark">#ff491c00</color>
+    <color name="wood">#FF784421</color>
+    <color name="wood_light">#FFA85F2E</color>
+    <color name="leaf_dark">#ff087f23</color>
+    <color name="leaf">#FF4CAF50</color>
+    <color name="leaf_light">#ff80e27e</color>
 </resources>
