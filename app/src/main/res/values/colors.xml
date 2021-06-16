@@ -8,10 +8,10 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="wood_dark">#ff491c00</color>
-    <color name="wood">#FF784421</color>
-    <color name="wood_light">#FFA85F2E</color>
-    <color name="leaf_dark">#ff087f23</color>
+    <color name="wood_dark">#ff4b2c20</color>
+    <color name="wood">#FF795548</color>
+    <color name="wood_light">#FFa98274</color>
+    <color name="leaf_dark">#ff00701a</color>
     <color name="leaf">#FF4CAF50</color>
-    <color name="leaf_light">#ff80e27e</color>
+    <color name="leaf_light">#ff43a047</color>
 </resources>
