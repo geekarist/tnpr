@@ -6,4 +6,8 @@ It uses [Navitia](https://navitia.io), which is "the open API for building cool 
 
 ## Installation
 
-Download the latest APK _on your Android device_ in [Releases](https://todo). Open it using your Android file manager and install it. 
+- Open [Releases](https://github.com/geekarist/tnpr/releases) _on your Android device_
+- Look at the "Assets" of the latest release
+- Download the `.apk` file
+- Open the downloaded file
+- Install it 
