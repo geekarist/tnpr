@@ -49,3 +49,15 @@ Press the first item.
 The last screen displays your journey in detail. You see each section of it, including when you have to wait or transfer from a transport mode to another. 
 
 <img src="README_assets/7-sections.png" height="400px" />
+
+## Architecture
+
+TODO
+
+## Contributing
+
+TODO
+
+## LICENSE
+
+See [COPYING](COPYING).
