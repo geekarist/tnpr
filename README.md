@@ -52,6 +52,18 @@ The last screen displays your journey in detail. You see each section of it, inc
 
 ## Architecture
 
+### System
+
+![](README_assets/SystemArch.png)
+
+TODO
+
+### Application
+
+TODO
+
+### Feature
+
 TODO
 
 ## Contributing
