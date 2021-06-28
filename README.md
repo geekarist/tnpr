@@ -58,11 +58,19 @@ The last screen displays your journey in detail. You see each section of it, inc
 
 TODO
 
-### Application
+### Dependencies
+
+| Concrete | Abstract |
+|---|---|
+|![](README_assets/DepsArch-Concrete.png)|![](README_assets/DepsArch-Abstract.png)|
 
 TODO
 
-### Feature
+### Features
+
+TODO
+
+### Layers
 
 TODO
 
