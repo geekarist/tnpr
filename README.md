@@ -54,7 +54,7 @@ The last screen displays your journey in detail. You see each section of it, inc
 
 ### System
 
-![](README_assets/SystemArch.png)
+![](README_assets/system.png)
 
 TODO
 
@@ -62,7 +62,7 @@ TODO
 
 | Concrete                                 | Abstract                                 |
 |------------------------------------------|------------------------------------------|
-| ![](README_assets/DepsArch-Concrete.png) | ![](README_assets/DepsArch-Abstract.png) |
+| ![](README_assets/deps-concrete.png) | ![](README_assets/deps-abstract.png) |
 
 TODO
 
