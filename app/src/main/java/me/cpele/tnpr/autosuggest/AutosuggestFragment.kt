@@ -7,9 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.ImageButton
-import android.widget.ViewFlipper
 import androidx.core.content.getSystemService
+import androidx.core.view.children
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -100,17 +101,26 @@ class AutosuggestFragment : Fragment() {
         clearButton: ImageButton,
         refreshLayout: SwipeRefreshLayout
     ) {
-        val viewFlipper = view?.findViewById<ViewFlipper>(R.id.autosuggest_view_flipper)
+        val resultContainer = view?.findViewById<FrameLayout>(R.id.autosuggest_result_container)
+
+        resultContainer?.children?.forEach { it.visibility = View.GONE }
+
         when (val answer = state.answer) {
             is SuggestAnswerUiModel.Some -> {
                 adapter.submitList(answer.places)
-                viewFlipper?.displayedChild = 2
+                resultContainer
+                    ?.findViewById<View>(R.id.autosuggest_results_recycler)
+                    ?.visibility = View.VISIBLE
             }
             SuggestAnswerUiModel.None -> {
-                viewFlipper?.displayedChild = 1
+                resultContainer
+                    ?.findViewById<View>(R.id.autosuggest_none_found_text)
+                    ?.visibility = View.VISIBLE
             }
             is SuggestAnswerUiModel.Fail -> {
-                viewFlipper?.displayedChild = 0
+                resultContainer
+                    ?.findViewById<View>(R.id.autosuggest_error_container)
+                    ?.visibility = View.VISIBLE
             }
         }
 

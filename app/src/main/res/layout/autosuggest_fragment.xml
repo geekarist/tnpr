@@ -70,15 +70,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/autosuggest_search_cardview">
 
-        <ViewFlipper
-            android:id="@+id/autosuggest_view_flipper"
+        <FrameLayout
+            android:id="@+id/autosuggest_result_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/linearLayoutCompat"
+                android:id="@+id/autosuggest_error_container"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                tools:visibility="gone">
 
                 <TextView
                     android:id="@+id/autosuggest_error_text"
@@ -109,21 +110,24 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
+                android:id="@+id/autosuggest_none_found_text"
                 style="@style/TextAppearance.AppCompat.Headline"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:paddingHorizontal="16dp"
-                android:text="@string/autosuggest_not_found" />
+                android:text="@string/autosuggest_not_found"
+                tools:visibility="gone" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/autosuggest_results_recycler"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/autosuggest_result_view" />
+                tools:listitem="@layout/autosuggest_result_view"
+                tools:visibility="visible" />
 
-        </ViewFlipper>
+        </FrameLayout>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
