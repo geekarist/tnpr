@@ -60,13 +60,15 @@ TODO
 
 ### Dependencies
 
-| Concrete | Abstract |
-|---|---|
-|![](README_assets/DepsArch-Concrete.png)|![](README_assets/DepsArch-Abstract.png)|
+| Concrete                                 | Abstract                                 |
+|------------------------------------------|------------------------------------------|
+| ![](README_assets/DepsArch-Concrete.png) | ![](README_assets/DepsArch-Abstract.png) |
 
 TODO
 
 ### Features
+
+![](README_assets/features.png)
 
 TODO
 
