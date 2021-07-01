@@ -74,11 +74,15 @@ TODO
 
 ### Layers
 
-TODO
+![](README_assets/layers.png)
 
 ## Contributing
 
-TODO
+Unfortunately, I won't have time to maintain this repository, develop new features nor fix issues. 
+
+I won't take any pull request.
+
+But the repository can be forked and the [Discussion](discussions) feature is enabled.
 
 ## LICENSE
 
