@@ -50,39 +50,15 @@ The last screen displays your journey in detail. You see each section of it, inc
 
 <img src="README_assets/7-sections.png" height="400px" />
 
-## Architecture
-
-### System
-
-![](README_assets/system.png)
-
-TODO
-
-### Dependencies
-
-| Concrete                                 | Abstract                                 |
-|------------------------------------------|------------------------------------------|
-| ![](README_assets/deps-concrete.png) | ![](README_assets/deps-abstract.png) |
-
-TODO
-
-### Features
-
-![](README_assets/features.png)
-
-TODO
-
-### Layers
-
-![](README_assets/layers.png)
-
 ## Contributing
 
 Unfortunately, I won't have time to maintain this repository, develop new features nor fix issues. 
 
 I won't take any pull request.
 
-But the repository can be forked and the [Discussion](discussions) feature is enabled.
+But the repository can be forked and questions can be asked in [github.com/geekarist/tnpr/discussions](https://github.com/geekarist/tnpr/discussions). 
+
+To know more about the code, see [ARCHITECTURE](ARCHITECTURE.md).
 
 ## LICENSE
 
