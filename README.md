@@ -20,9 +20,13 @@ When you open the application, the initial screen lets you choose an origin and 
 
 Press the "Origin" button to choose an origin.
 
+<div id="place-suggestion-feature">
+
 The next screen will suggest you a place based on any text you type: an address, a point of interest, etc. Start typing an address, e.g. "117 boulevard voltaire".
 
 <img src="README_assets/2-suggest-origin.png" height="400px" />
+
+</div>
 
 Choose the first suggestion, which is in Paris, then you're back to the initial screen.
 
@@ -34,6 +38,8 @@ Type "cnit" in the next screen and press the first suggestion (CNIT is a busines
 
 <img src="README_assets/4-suggest-dest.png" height="400px" />
 
+<div id="journey-search-feature">
+
 Back again to the initial screen, but now you can press the button with the 🔍 icon to find journeys from your origin to your destination.
 
 <img src="README_assets/5-search-journeys.png" height="400px" />
@@ -43,6 +49,8 @@ Press the 🔍 button.
 The next screen shows you the best journeys from your origin to your destination. The first item is the most "interesting" one because it has transfers. 
 
 <img src="README_assets/6-choose-journey.png" height="400px" />
+
+</div>
 
 Press the first item.
 
