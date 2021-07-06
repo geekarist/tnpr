@@ -41,29 +41,7 @@ This package contains TNPR's source code (`tnpr` subpackage) and a custom framew
 
 `afk` is a lightweight framework on which Android apps can be based. It also contains reusable classes and functions.
 
-Why extract these classes as a custom framework? Everytime I create a new Android app, I create or copy/paste these classes. So I thought it would be appropriate to code them once and reuse them later. NB: for now `me.cpele.afk` is part of TNPR, but in the future it will be distributed separately.
-
-It contains:
-
-- `Component`: this is an interface that can be implemented by the app's `ViewModel`s: 
-  - It has a `dispatch(Action)` method which executes an `Action`. An `Action` could be e.g. `LoadData(id: Int)` to trigger a request to a web service and load data, or `SearchJourneys(origin: Place, destiation: Place)` to find a journey from a point A to a point B.
-  - It has a `stateLive` property representing the "state" or "model" of a view, expressed in a way that should be independent of the UI framework.
-  - It has an `eventLive` property that allows "events" or "effects" to come back to the UI without forcing the `Component` to retain a reference to the view. 
-
-- Some utility classes or functions:
-  - `ViewModelFactory`: a generic `ViewModelProvider.Factory` that is used to instantiate a `ViewModel` from an `Activity` or a `Fragment` like this:
-    ```kotlin
-    private val viewModel: AutosuggestViewModel by viewModels {
-        ViewModelFactory {
-            AutosuggestViewModel(
-                CustomApp.instance.navitiaService
-            )
-        }
-    }
-    ```
-  - `Event`: a data holder that can be "consumed". It is used by the `Component.eventLive` property to represent one-shot events that "bubble up" to the UI. One use case of this class is display a message only once using `Toast`.
-  - `Outcome`: like a `kotlin.Result`, it represents an outcome that can be successful (`Outcome.success(obj)`) or a failure (`Outcome.failure(throwable)`). But unlike `Result`, `Outcome` can be returned by functions. It is used mainly to call web services.
-  - `Dates.kt`: date parsing
+To learn more about AFK, see the [AFK custom framework experiment section](#afk-custom-framework)
 
 #### Network
 
@@ -107,7 +85,7 @@ Thanks to Jetpack Navigation, here is a diagram showing all of the app's screens
 
 This app was a way for me to try a few things I could not try on my day job as and Android developer. In this section you'll find some of the experiments I tried.
 
-#### Transmodel
+#### Transmodel data model
 
 Transmodel is the name of a reference data model to represent public transport data. I tried to use it as the internal data model of the application, but decided not to use it.
 
@@ -118,10 +96,38 @@ Transmodel is a complex model, its complexity comes from features which were not
 
 I choosed to stay with a projection of the Navitia data model. By "projection" I mean that I took the model as is, only keeping the resources and attributes I wanted TNPR to manage. Navitia's model is simpler and better suited for an application that is only targeted at passengers.
 
-#### Flow
+#### AFK custom framework
 
-TODO?
+The `me.cpele.afk` is the first step of a custom lightweight framework for Android app development.
 
-#### Cycle.js
+It contains classes that I used to rewrite or copy/paste each time I was developing a new Android application. So I thought it would be appropriate to code them once and reuse them later. NB: for now `me.cpele.afk` is part of TNPR, but in the future it will be distributed separately.
+
+It contains:
+
+- `Component`: this is an interface that can be implemented by the app's `ViewModel`s: 
+  - It has a `dispatch(Action)` method which executes an `Action`. An `Action` could be e.g. `LoadData(id: Int)` to trigger a request to a web service and load data, or `SearchJourneys(origin: Place, destiation: Place)` to find a journey from a point A to a point B.
+  - It has a `stateLive` property representing the "state" or "model" of a view, expressed in a way that should be independent of the UI framework.
+  - It has an `eventLive` property that allows "events" or "effects" to come back to the UI without forcing the `Component` to retain a reference to the view. 
+
+- Some utility classes or functions:
+  - `ViewModelFactory`: a generic `ViewModelProvider.Factory` that is used to instantiate a `ViewModel` from an `Activity` or a `Fragment` like this:
+    ```kotlin
+    private val viewModel: AutosuggestViewModel by viewModels {
+        ViewModelFactory {
+            AutosuggestViewModel(
+                CustomApp.instance.navitiaService
+            )
+        }
+    }
+    ```
+  - `Event`: a data holder that can be "consumed". It is used by the `Component.eventLive` property to represent one-shot events that "bubble up" to the UI. One use case of this class is display a message only once using `Toast`.
+  - `Outcome`: like a `kotlin.Result`, it represents an outcome that can be successful (`Outcome.success(obj)`) or a failure (`Outcome.failure(throwable)`). But unlike `Result`, `Outcome` can be returned by functions. It is used mainly to call web services.
+  - `Dates.kt`: date parsing
+
+#### Data `Flow`ing through functions
+
+TODO
+
+#### Taking out effects
 
 TODO
