@@ -14,9 +14,13 @@ Navitia provides two routes that TNPR uses:
 
 ### Layers
 
+TODO
+
 ![](README_assets/layers.png)
 
 ### Dependencies
+
+TODO: remove "abstract" diagram
 
 The dependencies of TNPR can be represented in two ways: 
 - Abstract, where each dependency is labeled in a generic way, independant of the framework: "standard library", "type-safe HTTP client"... 
@@ -36,6 +40,8 @@ Read on to learn about these packages.
 This package contains TNPR's source code (`tnpr` subpackage) and a custom framework (`afk` subpackage).
 
 `afk` is a lightweight framework on which Android apps can be based. It also contains reusable classes and functions.
+
+Why extract these classes as a custom framework? Everytime I create a new Android app, I create or copy/paste these classes. So I thought it would be appropriate to code them once and reuse them later. NB: for now `me.cpele.afk` is part of TNPR, but in the future it will be distributed separately.
 
 It contains:
 
@@ -61,22 +67,42 @@ It contains:
 
 #### Network
 
-TODO
+The network package is `com.squareup`, it contains the libraries provided by Square to manage HTTP connections: `retrofit2` and `okhttp3`.
+
+These libraries have been chosen because they are well established and widely known.
 
 #### UI
 
-TODO
+Some UI components come from [Material Components](https://material.io/components?platform=android).
 
-## Language
+Why? Material components are cross-platform, abundantly documented and commonly used.
 
-TODO
+## Language: `org.jetbrains`
 
-## Runtime environment
+The app depends on this package that provides the Kotlin standard library (`kotlin.stdlib`) and the Coroutines library (`kotlinx.coroutines`).
 
-TODO
+Coroutines are used to implement asynchronous operations like calls to web services.
+
+Flows are used to implement asynchronous operations reperesented as streams, for example it allows to handle the user input in the Autosuggest screen.
+
+## Runtime environment: `androidx`
+
+Some AndroidX libraries bring Android related facilities (Jetpack), utilities that are provided as libraries.
+
+The `core` subpackage is for extensions of the Android SDK, it brings e.g. `View.children` or `Context.getSystemService`.
+
+`lifecycle` brings facilities to manage Android components that have a lifecycle like Activities or Fragments. This is the home of the `ViewModel` and `LiveData` classes. `LiveData` could be replaced by `Flow` but `LiveData` is still widely used and better suited to Android.
+
+`appcompat` implements components that supersed those that come with the Android SDK, it has better backward and forward compatibiliy e.g. `ActivityCompat`.
+
+`navigation` is the Jetpack component to implement navigation. It has drawbacks, mostly in the dependency relations it requires, but it was a simple way to design the app's navigation efficiently. It also provides editing tools that offer a global view of the app's UI, as you'll see [in the Features section](#features-diagram).
 
 ### Features
 
-![](README_assets/features.png)
+<img id="features-diagram" src="README_assets/features.png">
+
+TODO
+
+### Experiments
 
 TODO
