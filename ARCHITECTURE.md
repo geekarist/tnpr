@@ -99,9 +99,9 @@ The `core` subpackage is for extensions of the Android SDK, it brings e.g. `View
 
 ### Features
 
-<img id="features-diagram" src="README_assets/features.png">
+Thanks to Jetpack Navigation, here is a diagram showing all of the app's screens.
 
-TODO
+<img id="features-diagram" src="README_assets/features.png" width="800">
 
 ### Experiments
 
