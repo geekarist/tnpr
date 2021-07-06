@@ -105,4 +105,23 @@ Thanks to Jetpack Navigation, here is a diagram showing all of the app's screens
 
 ### Experiments
 
+This app was a way for me to try a few things I could not try on my day job as and Android developer. In this section you'll find some of the experiments I tried.
+
+#### Transmodel
+
+Transmodel is the name of a reference data model to represent public transport data. I tried to use it as the internal data model of the application, but decided not to use it.
+
+Transmodel is a complex model, its complexity comes from features which were not useful for the purpose of TNPR, notably:
+
+- Separate concepts for the spatial and temporal aspects of transport data
+- A representation for passengers, drivers and other types of "users" of public tranport modes
+
+I choosed to stay with a projection of the Navitia data model. By "projection" I mean that I took the model as is, only keeping the resources and attributes I wanted TNPR to manage. Navitia's model is simpler and better suited for an application that is only targeted at passengers.
+
+#### Flow
+
+TODO?
+
+#### Cycle.js
+
 TODO
