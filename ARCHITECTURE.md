@@ -14,13 +14,25 @@ Navitia provides two routes that TNPR uses:
 
 ### Layers
 
-TODO
+TNPR follows the MVVM architecture. Well, at leat it follows my interpretation of it. 
 
 ![](README_assets/layers.png)
 
-### Dependencies
+In this diagram, you see:
 
-TODO: remove "abstract" diagram
+- The user
+- The app
+  - The View: this is the UI code that is closely tied to the Android SDK and UI/widget library: `Activity`, `Fragment`, `Context`, `android.view.View`, XML layouts...
+  - The ViewModel: as [the Presentation Model described by Martin Fowler](https://martinfowler.com/eaaDev/PresentationModel.html), this is "an abstract of the view that is not dependent on a specific GUI framework". 
+    So theoretically, it could be reused in any app targeting any UI framework e.g. Android, iOS or the web using Kotlin Multiplatform, Android or the desktop using Compose...
+  - The Model: this is where TNPR's "intelligence" resides.
+    When the app has to process data, it does it by converting the data into internal representation that is not at all tied to the view (ViewModel → Model), does the processing (`processingModel = model(data)`), and then converts the data into a representation (`uiState.updatedWith(processingModel)`) that can be easily displayed by the View (Model → ViewModel).
+    TNPR does not have a proper `model` package or classes, but the `model(data)` is defined as a pure function: it only converts data, applying computations in the process.
+- The "cloud" (mainly Navitia web services)
+
+To learn more about that, see [the MVVM experiment section](#mvvm-viewviewmodelmodel).
+
+### Dependencies
 
 The dependencies of TNPR can be represented in two ways: 
 - Abstract, where each dependency is labeled in a generic way, independant of the framework: "standard library", "type-safe HTTP client"... 
@@ -107,7 +119,7 @@ It contains:
 - `Component`: this is an interface that can be implemented by the app's `ViewModel`s: 
   - It has a `dispatch(Action)` method which executes an `Action`. An `Action` could be e.g. `LoadData(id: Int)` to trigger a request to a web service and load data, or `SearchJourneys(origin: Place, destiation: Place)` to find a journey from a point A to a point B.
   - It has a `stateLive` property representing the "state" or "model" of a view, expressed in a way that should be independent of the UI framework.
-  - It has an `eventLive` property that allows "events" or "effects" to come back to the UI without forcing the `Component` to retain a reference to the view. 
+  - It has an `eventLive` property that allows one-shot "events" or "effects" to come back to the UI without forcing the `Component` to retain a reference to the view. 
 
 - Some utility classes or functions:
   - `ViewModelFactory`: a generic `ViewModelProvider.Factory` that is used to instantiate a `ViewModel` from an `Activity` or a `Fragment` like this:
@@ -124,6 +136,10 @@ It contains:
   - `Outcome`: like a `kotlin.Result`, it represents an outcome that can be successful (`Outcome.success(obj)`) or a failure (`Outcome.failure(throwable)`). But unlike `Result`, `Outcome` can be returned by functions. It is used mainly to call web services.
   - `Dates.kt`: date parsing
 
+#### MVVM: `view(viewmodel(model)))`
+
+TODO
+
 #### Data `Flow`ing through functions
 
 TODO
@@ -131,3 +147,13 @@ TODO
 #### Taking out effects
 
 TODO
+
+#### Future experiments
+
+TODO
+
+Jetpack compose
+
+Redux
+
+Arrow
