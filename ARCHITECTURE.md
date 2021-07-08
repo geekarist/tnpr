@@ -148,12 +148,9 @@ TODO
 
 TODO
 
-#### Future experiments
+#### What next?
 
-TODO
-
-Jetpack compose
-
-Redux
-
-Arrow
+There are a few other things I would like to explore:
+- [Jetpack Compose](https://developer.android.com/jetpack/compose)
+- [ReduxKotlin](https://reduxkotlin.org/)
+- [Functional Android development using Arrow](https://medium.com/default-to-open/explaining-the-arrow-android-sample-ee5c8bdfe88a)
