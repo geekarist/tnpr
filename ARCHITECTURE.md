@@ -14,7 +14,7 @@ Navitia provides two routes that TNPR uses:
 
 ### Layers
 
-TNPR follows the MVVM architecture. Well, at leat it follows my interpretation of it. 
+TNPR follows the MVVM architecture. Well, at least it follows my interpretation of it. 
 
 ![](README_assets/layers.png)
 
@@ -26,7 +26,7 @@ In this diagram, you see:
   - The ViewModel: as [the Presentation Model described by Martin Fowler](https://martinfowler.com/eaaDev/PresentationModel.html), this is "an abstract of the view that is not dependent on a specific GUI framework". 
     So theoretically, it could be reused in any app targeting any UI framework e.g. Android, iOS or the web using Kotlin Multiplatform, Android or the desktop using Compose...
   - The Model: this is where TNPR's "intelligence" resides.
-    When the app has to process data, it does it by converting the data into internal representation that is not at all tied to the view (ViewModel → Model), does the processing (`processingModel = model(data)`), and then converts the data into a representation (`uiState.updatedWith(processingModel)`) that can be easily displayed by the View (Model → ViewModel).
+    When the app has to process data, it does it by converting the data into internal representation that is not at all tied to the View (ViewModel → Model), does the processing (`processingModel = model(data)`), and then converts the data into a representation (`uiState.updatedWith(processingModel)`) that can be easily displayed by the View (Model → ViewModel).
     TNPR does not have a proper `model` package or classes, but the `model(data)` is defined as a pure function: it only converts data, applying computations in the process.
 - The "cloud" (mainly Navitia web services)
 
@@ -35,9 +35,10 @@ To learn more about that, see [the MVVM experiment section](#mvvm-viewviewmodelm
 ### Dependencies
 
 The dependencies of TNPR can be represented in two ways: 
-- Abstract, where each dependency is labeled in a generic way, independant of the framework: "standard library", "type-safe HTTP client"... 
-    This exact representation of the dependencies could apply to the same application not targeting Android, but instead a web browser or a desktop OS.
-- Concrete, where each dependency is labeled specifically as the implementation that is used in TNPR: "standard libary" → `kotlin.stdlib`, "type-safe HTTP client" → `com.squareup.retrofit2`. 
+
+- **Abstract**, where each dependency is labeled in a generic way, independant of the framework: "standard library", "type-safe HTTP client"... 
+    This representation of the dependencies could apply to the same application not targeting Android, but instead a web browser or a desktop OS.
+- **Concrete**, where each dependency is labeled specifically as the implementation that is used in TNPR: "standard libary" → `kotlin.stdlib`, "type-safe HTTP client" → `com.squareup.retrofit2`. 
 
 | Concrete                                 | Abstract                                 |
 |------------------------------------------|------------------------------------------|
@@ -45,7 +46,7 @@ The dependencies of TNPR can be represented in two ways:
 
 Each diagram is split into high-level packages: Application, Network, UI, Runtime environment and Language.
 
-Read on to learn about these packages.
+Read on to learn more about these packages.
 
 #### Application (`me.cpele`)
 
@@ -65,15 +66,15 @@ These libraries have been chosen because they are well established and widely kn
 
 Some UI components come from [Material Components](https://material.io/components?platform=android).
 
-Why? Material components are cross-platform, abundantly documented and commonly used.
+Why? Material components are cross-platform, documented and commonly used.
 
 ## Language: `org.jetbrains`
 
 The app depends on this package that provides the Kotlin standard library (`kotlin.stdlib`) and the Coroutines library (`kotlinx.coroutines`).
 
-Coroutines are used to implement asynchronous operations like calls to web services.
+Coroutines are used to implement asynchronous operations like calling web services.
 
-Flows are used to implement asynchronous operations reperesented as streams, for example it allows to handle the user input in the Autosuggest screen.
+`Flow`s are used to implement asynchronous operations reperesented as streams, for example it allows to handle the user input in the Autosuggest screen.
 
 ## Runtime environment: `androidx`
 
@@ -85,7 +86,7 @@ The `core` subpackage is for extensions of the Android SDK, it brings e.g. `View
 
 `appcompat` implements components that supersed those that come with the Android SDK, it has better backward and forward compatibiliy e.g. `ActivityCompat`.
 
-`navigation` is the Jetpack component to implement navigation. It has drawbacks, mostly in the dependency relations it requires, but it was a simple way to design the app's navigation efficiently. It also provides editing tools that offer a global view of the app's UI, as you'll see [in the Features section](#features-diagram).
+`navigation` is the Jetpack component to implement navigation. It has drawbacks, mostly in the dependency relations it requires, but it was a simple way to design the app's navigation quickly. It also provides editing tools that offer a global view of the app's UI, as you'll see [in the Features section](#features-diagram).
 
 ### Features
 
@@ -95,18 +96,18 @@ Thanks to Jetpack Navigation, here is a diagram showing all of the app's screens
 
 ### Experiments
 
-This app was a way for me to try a few things I could not try on my day job as and Android developer. In this section you'll find some of the experiments I tried.
+This app was a way for me to try a few things I could not try on my day job as an Android developer. In this section you'll find some of the experiments I tried.
 
 #### Transmodel data model
 
-Transmodel is the name of a reference data model to represent public transport data. I tried to use it as the internal data model of the application, but decided not to use it.
+Transmodel is the name of a european reference data model to represent public transport data. I tried to use it as the internal data model of the application, but decided not to.
 
 Transmodel is a complex model, its complexity comes from features which were not useful for the purpose of TNPR, notably:
 
-- Separate concepts for the spatial and temporal aspects of transport data
-- A representation for passengers, drivers and other types of "users" of public tranport modes
+- Separate representations for the spatial and temporal aspects of transport data
+- A representation for passengers, drivers and other types of users of public tranport modes
 
-I choosed to stay with a projection of the Navitia data model. By "projection" I mean that I took the model as is, only keeping the resources and attributes I wanted TNPR to manage. Navitia's model is simpler and better suited for an application that is only targeted at passengers.
+I choosed to use a simpler data model, which is a projection of the Navitia data model. By "projection" I mean that I took the Navitia model as is, only keeping the resources and attributes I wanted TNPR to manage. Navitia's model is better suited for an application that is only targeted at passengers.
 
 #### AFK custom framework
 
@@ -119,7 +120,7 @@ It contains:
 - `Component`: this is an interface that can be implemented by the app's `ViewModel`s: 
   - It has a `dispatch(Action)` method which executes an `Action`. An `Action` could be e.g. `LoadData(id: Int)` to trigger a request to a web service and load data, or `SearchJourneys(origin: Place, destiation: Place)` to find a journey from a point A to a point B.
   - It has a `stateLive` property representing the "state" or "model" of a view, expressed in a way that should be independent of the UI framework.
-  - It has an `eventLive` property that allows one-shot "events" or "effects" to come back to the UI without forcing the `Component` to retain a reference to the view. 
+  - It has an `eventLive` property that allows one-shot "events" or "effects" to come back to the UI without forcing the `Component` to retain a reference to the View. 
 
 - Some utility classes or functions:
   - `ViewModelFactory`: a generic `ViewModelProvider.Factory` that is used to instantiate a `ViewModel` from an `Activity` or a `Fragment` like this:
@@ -315,7 +316,7 @@ override fun onActivityCreated(savedInstanceState: Bundle?) {
 }
 ```
 
-And here is `RoadmapViewModel.load()`. It sends an `Input.Start`:
+Here is `RoadmapViewModel.load()`. It sends an `Input.Start`:
 
 ```kotlin
 fun load(tripId: String) {
@@ -345,7 +346,7 @@ fun load(tripId: String) {
 }
 ```
 
-😅
+Easy 😅
 
 This experiment should be conducted in a more complex use case, but I have the intuition that it would not be worth it. Perhaps when the app has to interact with many third party SDKs or frameworks? I don't know.
 
