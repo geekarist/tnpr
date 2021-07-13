@@ -139,7 +139,85 @@ It contains:
 
 #### Data `Flow`ing through functions
 
-TODO (see AutosuggestViewModel)
+The place autosuggestion feature makes heavy use of kotlin `Flow`s. Here is the code in `AutosuggestViewModel`:
+
+```kotlin
+init {
+    queryFlow
+        // 0. Prepare and filter query
+        .debounce(1000)
+        .map { it.value }
+        .filterNotNull()
+        // 1. Initial state and post
+        .map { query -> pairQueryToInitialOp(query) }
+        .flowOn(Dispatchers.Default)
+        .onEach { (_, initialOp) -> maybePostEmptyState(initialOp) }
+        .flowOn(Dispatchers.Main)
+        // 2. State at start (loading) and post
+        .filterNot { (query, _) -> query.isBlank() }
+        .map { (query, _) -> pairQueryToStateAtStart(query) }
+        .flowOn(Dispatchers.Default)
+        .onEach { (_, stateAtStart) -> _stateLive.value = stateAtStart }
+        .flowOn(Dispatchers.Main)
+        // 3. Fetch suggestions
+        .map { (query, _) -> fetchPlaces(query) }
+        .flowOn(Dispatchers.IO)
+        // 4. Map to UI model then post final state
+        .map { result -> result.toUiModel() }
+        .map { uiModel -> mapToFinalState(uiModel) }
+        .flowOn(Dispatchers.Default)
+        .onEach { newState -> _stateLive.value = newState }
+        .flowOn(Dispatchers.Main)
+        .launchIn(viewModelScope)
+}
+```
+
+It is a composition of 5 processing steps implemented as Kotlin functions:
+
+0. Query preparation
+    - Debounce queries emitted "upstream" with a timeout of 1000 msec
+    - Extract the `Query.value` attribute with a `map`
+    - Exclude `null` values
+1. Initial state
+    - In `pairQueryToInitialOp`, prepare initial operation which can be "post empty state" or "pass", according to the query and current state
+    - Dispatch upstream processing (step 0 to here) to a computing thread (`Dispatchers.Default`)
+    - Post the initial operation as a new state if appropriate
+    - Dispatch upstream processing (from previous dispatch to here) to the main thread (because posting the initial operation updates a `LiveData`, and this has to occur on the main thread)
+    - At this point, the View should be all set to start displaying suggestions according to the user's queries
+2. "Loading" state
+    - Exclude blank queries with `filterNot`
+    - In `pairQueryToStateAtStart`, copy current state, triggering the loading or refresh indicator and making the query field unclearable
+    - Dispatch upstream processing to a computing thread
+    - Post the new state
+    - Dispatch upstream processing to the main thread
+    - From now on, the View should display a progress bar to indicate that processing is being done
+3. Fetch suggestions
+    - In `fetchPlaces`, call the `/places` web service to fetch suggestions according to the query
+    - Dispatch upstream processing to an IO thread (IO is for any input/output operation like disk access or calling a web service)
+    - The View is still displaying the progress bar
+4. UI model (re)construction
+    - Map the response of the web service to an UI model with `response.toUiModel()`
+    - Copy the current state, updating its `answer` property with the UI model
+    - Dispatch upstream processing to a computing thread
+    - Post the new state
+    - Dispatch upstream processing to the main thread
+    - And now the View is displaying the suggestions that have been fetched from the web service
+
+The most satisfying aspect of this experiment is that it allows to separate the main concerns of the autosuggestion feature:
+
+- Taking the user's input (queries)
+- Preparation of an initial or "loading" state
+- Fetching places from a web service
+- Converting those places to a data model that is better suited to the View (UI model)
+- Send the UI model to the View
+
+And thanks to Kotlin `Flow`s, each step is dispatched to the proper thread (computing, processing or the main thread).
+
+Please note that this autosuggestion use case is a simple one. `Flow`s would also make it easy to compose these steps with additional processing or other data sources, for example:
+
+- Compute the distance between the user's position and each suggested place
+- Display weather previsions at each suggested place
+- Display a ⭐ indicator when a suggested place is already saved as a user's favorite on the device's database
 
 #### Taking out effects
 
